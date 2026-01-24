@@ -36,11 +36,11 @@ const useGameEngine = (canvasRef) => {
 
   const resetGame = useCallback(() => {
     gameRef.current = {
-      fish: { x: 100, y: 300, velocity: 0, rotation: 0 },
+      fish: { x: 120, y: 250, velocity: 0, rotation: 0 },
       obstacles: [],
       collectibles: [],
       enemy: null,
-      lastObstacleTime: Date.now() + 1500, // Give 1.5 seconds before first obstacle
+      lastObstacleTime: Date.now() + 1200, // Give 1.2 seconds before first obstacle
       animationFrame: null,
       bubbles: [],
     };
