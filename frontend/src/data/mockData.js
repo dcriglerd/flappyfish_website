@@ -7,8 +7,8 @@ export const GAME_CONFIG = {
   obstacleInterval: 2200, // Increased from 2000 - more time between obstacles
   gapHeight: 190,         // Increased from 175 - larger gaps to swim through
   fishSize: 40,
-  chaseChance: 0.10,      // Reduced from 0.12 - less frequent chases
-  chaseDuration: 8000,    // ms
+  chaseChance: 0,         // Disabled - no shark/octopus chases
+  chaseDuration: 0,
 };
 
 export const POWER_UPS = [
