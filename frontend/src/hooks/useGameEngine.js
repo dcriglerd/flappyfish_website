@@ -40,7 +40,7 @@ const useGameEngine = (canvasRef) => {
       obstacles: [],
       collectibles: [],
       enemy: null,
-      lastObstacleTime: 0,
+      lastObstacleTime: Date.now() + 1500, // Give 1.5 seconds before first obstacle
       animationFrame: null,
       bubbles: [],
     };
