@@ -134,35 +134,34 @@ const FlappyFish = () => {
     setSelectedSkin(skin);
   }, []);
 
-  return (
-    <div className="relative w-full h-screen bg-gradient-to-b from-cyan-900 to-blue-950 flex items-center justify-center overflow-hidden">
-      {/* Background decorations */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        {/* Animated bubbles */}
-        {[...Array(15)].map((_, i) => (
-          <div
-            key={i}
-            className="absolute rounded-full bg-white/10 animate-float"
-            style={{
-              width: `${10 + Math.random() * 20}px`,
-              height: `${10 + Math.random() * 20}px`,
-              left: `${Math.random() * 100}%`,
-              bottom: `-50px`,
-              animationDuration: `${4 + Math.random() * 4}s`,
-              animationDelay: `${Math.random() * 3}s`,
-            }}
-          />
-        ))}
-      </div>
+  // Flap with sound
+  const handleFlap = useCallback(() => {
+    flap();
+    playFlapSound();
+  }, [flap, playFlapSound]);
 
+  // Coin collect with sound
+  const handleCoinCollect = useCallback((amount) => {
+    addCoins(amount);
+    playCoinSound();
+  }, [addCoins, playCoinSound]);
+
+  // Score update with sound
+  const handleScoreUpdate = useCallback((updater) => {
+    setScore(updater);
+    playScoreSound();
+  }, [setScore, playScoreSound]);
+
+  return (
+    <div className="relative w-full h-screen flex items-center justify-center overflow-hidden\" style={{ background: 'linear-gradient(180deg, #0a2a4a 0%, #0d4a6e 50%, #1a6a8a 100%)' }}>
       {/* Game Container */}
       <div className="relative">
         <GameCanvas
           gameState={gameState}
           gameRef={gameRef}
-          onFlap={flap}
-          onScoreUpdate={setScore}
-          onCoinCollect={addCoins}
+          onFlap={handleFlap}
+          onScoreUpdate={handleScoreUpdate}
+          onCoinCollect={handleCoinCollect}
           onGameOver={gameOver}
           onTriggerChase={triggerChase}
           isChasing={isChasing}
