@@ -106,11 +106,27 @@ Located in `/app/mobile/src/constants/config.js`:
   - Mute toggle on StartScreen and GameUI
 
 ## P2 - Future Tasks
-- [ ] Real Google AdMob integration (requires dev build)
 - [ ] Real payment processor (Stripe/RevenueCat)
 - [ ] Backend for user data persistence
 - [ ] Leaderboards
 - [ ] Achievements system
+
+## Recently Completed - Google AdMob Integration (Dec 2025)
+- [x] Added `react-native-google-mobile-ads` package
+- [x] Configured app.json with AdMob App IDs (test IDs)
+- [x] Created real AdsContext with InterstitialAd, RewardedAd, BannerAd
+- [x] BannerAdComponent uses ANCHORED_ADAPTIVE_BANNER
+- [x] Interstitial shows every 3 game overs
+- [x] Rewarded ad for revive feature
+- [x] Created eas.json for development builds
+- [x] App initializes Google Mobile Ads SDK on startup
+
+### Build Instructions
+```bash
+cd /app/mobile
+eas login
+eas build --platform android --profile development
+```
 
 ## Notes
 - **MOCKED:** Ads are mocked for Expo Go compatibility
