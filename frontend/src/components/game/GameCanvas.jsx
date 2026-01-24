@@ -735,12 +735,12 @@ const GameCanvas = ({
   return (
     <canvas
       ref={canvasRef}
-      width={800}
-      height={600}
+      width={1200}
+      height={900}
       onClick={handleInteraction}
       onTouchStart={handleInteraction}
-      className="rounded-2xl shadow-2xl cursor-pointer max-w-full"
-      style={{ touchAction: 'none' }}
+      className="rounded-2xl shadow-2xl cursor-pointer w-full h-full"
+      style={{ touchAction: 'none', maxWidth: '100vw', maxHeight: '100vh' }}
     />
   );
 };
