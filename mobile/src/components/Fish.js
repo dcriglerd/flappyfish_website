@@ -3,13 +3,12 @@ import { View, StyleSheet } from 'react-native';
 import Svg, { Ellipse, Polygon, Circle, Defs, LinearGradient, Stop } from 'react-native-svg';
 import { COLORS } from '../constants/config';
 
-const Fish = ({ position, rotation = 0, skinColor = COLORS.GOLD }) => {
+const Fish = ({ position, rotation = 0, skinColor = COLORS.GOLD, hasShield = false }) => {
   const isRainbow = skinColor === 'rainbow';
   
   // Darken color for outlines
   const getDarkerColor = (color) => {
     if (color === 'rainbow') return '#996600';
-    // Simple darkening by mixing with black
     return color;
   };
 
@@ -24,6 +23,31 @@ const Fish = ({ position, rotation = 0, skinColor = COLORS.GOLD }) => {
         },
       ]}
     >
+      {/* Shield bubble */}
+      {hasShield && (
+        <View style={styles.shieldBubble}>
+          <Svg width={80} height={70} viewBox="0 0 80 70">
+            <Ellipse
+              cx="40"
+              cy="35"
+              rx="38"
+              ry="33"
+              fill="rgba(100,200,255,0.2)"
+              stroke="rgba(100,200,255,0.6)"
+              strokeWidth="3"
+            />
+            {/* Shine effect */}
+            <Ellipse
+              cx="25"
+              cy="20"
+              rx="8"
+              ry="5"
+              fill="rgba(255,255,255,0.4)"
+            />
+          </Svg>
+        </View>
+      )}
+      
       <Svg width={60} height={50} viewBox="0 0 80 60">
         {isRainbow && (
           <Defs>
@@ -110,6 +134,13 @@ const styles = StyleSheet.create({
     position: 'absolute',
     width: 60,
     height: 50,
+  },
+  shieldBubble: {
+    position: 'absolute',
+    left: -10,
+    top: -10,
+    width: 80,
+    height: 70,
   },
 });
 
