@@ -84,73 +84,79 @@ const GameCanvas = ({
 
   const drawObstacle = useCallback((ctx, obstacle) => {
     const pipeWidth = 70;
-    const capHeight = 25;
+    const capHeight = 20;
     const capWidth = 80;
     const topPipeHeight = obstacle.gapY - GAME_CONFIG.gapHeight / 2;
     const bottomPipeY = obstacle.gapY + GAME_CONFIG.gapHeight / 2;
     const bottomPipeHeight = 600 - bottomPipeY;
 
-    // Pipe gradient (glossy green)
+    // Coral/seaweed pillar gradient (underwater colors)
     const pipeGradient = ctx.createLinearGradient(obstacle.x, 0, obstacle.x + pipeWidth, 0);
-    pipeGradient.addColorStop(0, '#228B22');
-    pipeGradient.addColorStop(0.2, '#32CD32');
-    pipeGradient.addColorStop(0.5, '#7CFC00');
-    pipeGradient.addColorStop(0.8, '#32CD32');
-    pipeGradient.addColorStop(1, '#228B22');
+    pipeGradient.addColorStop(0, '#1a5a4a');
+    pipeGradient.addColorStop(0.3, '#2d8a6e');
+    pipeGradient.addColorStop(0.5, '#3cb371');
+    pipeGradient.addColorStop(0.7, '#2d8a6e');
+    pipeGradient.addColorStop(1, '#1a5a4a');
 
-    // Cap gradient
+    // Cap gradient (coral top)
     const capGradient = ctx.createLinearGradient(obstacle.x - 5, 0, obstacle.x + capWidth - 5, 0);
-    capGradient.addColorStop(0, '#1B6B1B');
-    capGradient.addColorStop(0.2, '#228B22');
-    capGradient.addColorStop(0.5, '#3CB371');
-    capGradient.addColorStop(0.8, '#228B22');
-    capGradient.addColorStop(1, '#1B6B1B');
+    capGradient.addColorStop(0, '#145040');
+    capGradient.addColorStop(0.3, '#1a6b5a');
+    capGradient.addColorStop(0.5, '#2d8a6e');
+    capGradient.addColorStop(0.7, '#1a6b5a');
+    capGradient.addColorStop(1, '#145040');
 
-    // TOP PIPE
-    // Main pipe body
+    // TOP PILLAR
     ctx.fillStyle = pipeGradient;
     ctx.fillRect(obstacle.x, 0, pipeWidth, topPipeHeight - capHeight);
 
-    // Pipe cap
+    // Top cap
     ctx.fillStyle = capGradient;
     ctx.beginPath();
-    ctx.roundRect(obstacle.x - 5, topPipeHeight - capHeight, capWidth, capHeight, [0, 0, 6, 6]);
+    ctx.roundRect(obstacle.x - 5, topPipeHeight - capHeight, capWidth, capHeight, [0, 0, 8, 8]);
     ctx.fill();
 
-    // Cap highlight
-    ctx.fillStyle = 'rgba(255, 255, 255, 0.15)';
-    ctx.fillRect(obstacle.x + 5, topPipeHeight - capHeight + 3, capWidth - 25, capHeight - 6);
+    // Coral details on top pipe
+    ctx.fillStyle = 'rgba(100, 200, 150, 0.3)';
+    for (let i = 0; i < 3; i++) {
+      ctx.beginPath();
+      ctx.arc(obstacle.x + 15 + i * 20, topPipeHeight - capHeight - 10 - i * 15, 8, 0, Math.PI * 2);
+      ctx.fill();
+    }
 
-    // Pipe edge shadow
-    ctx.fillStyle = 'rgba(0, 0, 0, 0.2)';
-    ctx.fillRect(obstacle.x + pipeWidth - 8, 0, 8, topPipeHeight - capHeight);
-
-    // BOTTOM PIPE
-    // Main pipe body
+    // BOTTOM PILLAR
     ctx.fillStyle = pipeGradient;
     ctx.fillRect(obstacle.x, bottomPipeY + capHeight, pipeWidth, bottomPipeHeight - capHeight);
 
-    // Pipe cap
+    // Bottom cap
     ctx.fillStyle = capGradient;
     ctx.beginPath();
-    ctx.roundRect(obstacle.x - 5, bottomPipeY, capWidth, capHeight, [6, 6, 0, 0]);
+    ctx.roundRect(obstacle.x - 5, bottomPipeY, capWidth, capHeight, [8, 8, 0, 0]);
     ctx.fill();
 
-    // Cap highlight
-    ctx.fillStyle = 'rgba(255, 255, 255, 0.15)';
-    ctx.fillRect(obstacle.x + 5, bottomPipeY + 3, capWidth - 25, capHeight - 6);
+    // Barnacles/coral bumps
+    ctx.fillStyle = '#4a8068';
+    for (let i = 0; i < 4; i++) {
+      ctx.beginPath();
+      ctx.arc(
+        obstacle.x + 10 + (i % 2) * 50,
+        bottomPipeY + capHeight + 30 + i * 40,
+        6 + (i % 2) * 3,
+        0, Math.PI * 2
+      );
+      ctx.fill();
+    }
 
-    // Pipe edge shadow
-    ctx.fillStyle = 'rgba(0, 0, 0, 0.2)';
-    ctx.fillRect(obstacle.x + pipeWidth - 8, bottomPipeY + capHeight, 8, bottomPipeHeight - capHeight);
+    // Subtle highlight
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.1)';
+    ctx.fillRect(obstacle.x + 5, 0, 15, topPipeHeight - capHeight);
+    ctx.fillRect(obstacle.x + 5, bottomPipeY + capHeight, 15, bottomPipeHeight - capHeight);
 
-    // Dark outline
-    ctx.strokeStyle = '#145214';
+    // Outline
+    ctx.strokeStyle = '#0d3d30';
     ctx.lineWidth = 2;
-    // Top pipe outline
     ctx.strokeRect(obstacle.x, 0, pipeWidth, topPipeHeight - capHeight);
     ctx.strokeRect(obstacle.x - 5, topPipeHeight - capHeight, capWidth, capHeight);
-    // Bottom pipe outline
     ctx.strokeRect(obstacle.x, bottomPipeY + capHeight, pipeWidth, bottomPipeHeight - capHeight);
     ctx.strokeRect(obstacle.x - 5, bottomPipeY, capWidth, capHeight);
   }, []);
