@@ -1,8 +1,9 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import useGameEngine from '../../hooks/useGameEngine';
+import useGameAudio from '../../hooks/useGameAudio';
 import GameCanvas from './GameCanvas';
 import GameUI from './GameUI';
-import MenuScreen from './MenuScreen';
+import StartScreen from './StartScreen';
 import GameOverScreen from './GameOverScreen';
 import PauseScreen from './PauseScreen';
 import ShopModal from './ShopModal';
@@ -42,9 +43,35 @@ const FlappyFish = () => {
     triggerChase,
   } = useGameEngine();
 
+  const {
+    playFlapSound,
+    playScoreSound,
+    playCoinSound,
+    playGameOverSound,
+    startBackgroundMusic,
+    stopBackgroundMusic,
+    setMuted,
+  } = useGameAudio();
+
+  // Handle mute changes
+  useEffect(() => {
+    setMuted(isMuted);
+  }, [isMuted, setMuted]);
+
+  // Start/stop music based on game state
+  useEffect(() => {
+    if (gameState === 'playing') {
+      startBackgroundMusic();
+    } else if (gameState === 'gameover') {
+      stopBackgroundMusic();
+      playGameOverSound();
+    }
+  }, [gameState, startBackgroundMusic, stopBackgroundMusic, playGameOverSound]);
+
   const handleStartGame = useCallback(() => {
     startGame();
-  }, [startGame]);
+    startBackgroundMusic();
+  }, [startGame, startBackgroundMusic]);
 
   const handlePause = useCallback(() => {
     pauseGame();
@@ -56,7 +83,8 @@ const FlappyFish = () => {
 
   const handleRestart = useCallback(() => {
     startGame();
-  }, [startGame]);
+    startBackgroundMusic();
+  }, [startGame, startBackgroundMusic]);
 
   const handleHome = useCallback(() => {
     setGameState('menu');
