@@ -8,6 +8,9 @@ const PurchasesContext = createContext();
 // RevenueCat API Key
 const REVENUECAT_API_KEY = 'test_NABQGDjFGFjEYgtuLvYsspaTccY';
 
+// RevenueCat App ID
+const REVENUECAT_APP_ID = 'appe2d4a5dd69';
+
 // Product identifiers (must match RevenueCat dashboard)
 export const PRODUCT_IDS = {
   COINS_100: 'coins_100',
