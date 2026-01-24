@@ -153,9 +153,9 @@ const FlappyFish = () => {
   }, [setScore, playScoreSound]);
 
   return (
-    <div className="relative w-full h-screen flex items-center justify-center overflow-hidden" style={{ background: 'linear-gradient(180deg, #00d4ff 0%, #00b4d8 30%, #0096c7 60%, #0077b6 100%)' }}>
+    <div className="relative w-full h-screen min-h-screen flex items-center justify-center overflow-hidden" style={{ background: 'linear-gradient(180deg, #00d4ff 0%, #00b4d8 30%, #0096c7 60%, #0077b6 100%)' }}>
       {/* Game Container */}
-      <div className="relative">
+      <div className="relative w-full h-full max-w-[800px] max-h-[600px]">
         <GameCanvas
           gameState={gameState}
           gameRef={gameRef}
