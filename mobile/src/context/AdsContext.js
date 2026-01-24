@@ -1,38 +1,23 @@
-import React, { createContext, useContext, useState, useEffect, useCallback, useRef } from 'react';
-import { Platform } from 'react-native';
-import {
-  BannerAd,
-  BannerAdSize,
-  InterstitialAd,
-  RewardedAd,
-  AdEventType,
-  RewardedAdEventType,
-  TestIds,
-} from 'react-native-google-mobile-ads';
+import React, { createContext, useContext, useState, useCallback, useRef } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { AD_CONFIG } from '../constants/config';
 
 const AdsContext = createContext();
 
-// Get Ad Unit IDs based on platform and test mode
-const getAdUnitId = (type) => {
-  const ids = AD_CONFIG.USE_TEST_IDS ? AD_CONFIG.TEST_IDS : AD_CONFIG.PRODUCTION_IDS;
-  const platformIds = Platform.OS === 'ios' ? ids[type].IOS : ids[type].ANDROID;
-  return platformIds;
-};
-
+/**
+ * MOCKED ADS PROVIDER for Expo Go
+ * Real Google Mobile Ads will be integrated in production builds
+ */
 export const AdsProvider = ({ children }) => {
   const [showBanner, setShowBanner] = useState(true);
   const [adsRemoved, setAdsRemoved] = useState(false);
-  const [isInterstitialLoaded, setIsInterstitialLoaded] = useState(false);
-  const [isRewardedLoaded, setIsRewardedLoaded] = useState(false);
+  const [isInterstitialLoaded, setIsInterstitialLoaded] = useState(true); // Always "ready" in mock
+  const [isRewardedLoaded, setIsRewardedLoaded] = useState(true);
   
   const deathCountRef = useRef(0);
-  const interstitialRef = useRef(null);
-  const rewardedRef = useRef(null);
 
-  // Load ads removed status
-  useEffect(() => {
+  // Load ads removed status on mount
+  React.useEffect(() => {
     AsyncStorage.getItem('flappyfish_ads_removed').then((value) => {
       if (value === 'true') {
         setAdsRemoved(true);
@@ -41,125 +26,48 @@ export const AdsProvider = ({ children }) => {
     });
   }, []);
 
-  // Initialize Interstitial Ad
-  useEffect(() => {
-    if (adsRemoved) return;
-
-    const interstitial = InterstitialAd.createForAdRequest(getAdUnitId('INTERSTITIAL'), {
-      requestNonPersonalizedAdsOnly: true,
-    });
-
-    const unsubscribeLoaded = interstitial.addAdEventListener(AdEventType.LOADED, () => {
-      setIsInterstitialLoaded(true);
-      console.log('[AdsManager] Interstitial loaded');
-    });
-
-    const unsubscribeClosed = interstitial.addAdEventListener(AdEventType.CLOSED, () => {
-      setIsInterstitialLoaded(false);
-      // Reload for next time
-      interstitial.load();
-    });
-
-    const unsubscribeError = interstitial.addAdEventListener(AdEventType.ERROR, (error) => {
-      console.log('[AdsManager] Interstitial error:', error);
-      setIsInterstitialLoaded(false);
-    });
-
-    interstitialRef.current = interstitial;
-    interstitial.load();
-
-    return () => {
-      unsubscribeLoaded();
-      unsubscribeClosed();
-      unsubscribeError();
-    };
-  }, [adsRemoved]);
-
-  // Initialize Rewarded Ad
-  useEffect(() => {
-    if (adsRemoved) return;
-
-    const rewarded = RewardedAd.createForAdRequest(getAdUnitId('REWARDED'), {
-      requestNonPersonalizedAdsOnly: true,
-    });
-
-    const unsubscribeLoaded = rewarded.addAdEventListener(RewardedAdEventType.LOADED, () => {
-      setIsRewardedLoaded(true);
-      console.log('[AdsManager] Rewarded ad loaded');
-    });
-
-    const unsubscribeEarned = rewarded.addAdEventListener(RewardedAdEventType.EARNED_REWARD, (reward) => {
-      console.log('[AdsManager] User earned reward:', reward);
-    });
-
-    const unsubscribeClosed = rewarded.addAdEventListener(AdEventType.CLOSED, () => {
-      setIsRewardedLoaded(false);
-      rewarded.load();
-    });
-
-    rewardedRef.current = rewarded;
-    rewarded.load();
-
-    return () => {
-      unsubscribeLoaded();
-      unsubscribeEarned();
-      unsubscribeClosed();
-    };
-  }, [adsRemoved]);
-
-  // Called on game over
+  // Called on game over - tracks death count for interstitial frequency
   const onGameOver = useCallback(() => {
     if (adsRemoved) return;
 
     deathCountRef.current += 1;
-    console.log(`[AdsManager] Death count: ${deathCountRef.current}`);
+    console.log(`[MockAds] Death count: ${deathCountRef.current}`);
 
-    // Show interstitial every N deaths
+    // In production, this would show interstitial every N deaths
     if (
       deathCountRef.current >= AD_CONFIG.INTERSTITIAL_FREQUENCY &&
       deathCountRef.current % AD_CONFIG.INTERSTITIAL_FREQUENCY === 0
     ) {
-      showInterstitial();
+      console.log('[MockAds] Would show interstitial ad here');
     }
   }, [adsRemoved]);
 
-  // Show interstitial ad
+  // Mock interstitial - just logs in Expo Go
   const showInterstitial = useCallback(() => {
     if (adsRemoved) return;
-    
-    if (isInterstitialLoaded && interstitialRef.current) {
-      interstitialRef.current.show();
-    } else {
-      console.log('[AdsManager] Interstitial not ready');
-    }
-  }, [adsRemoved, isInterstitialLoaded]);
+    console.log('[MockAds] Interstitial ad displayed (mocked)');
+  }, [adsRemoved]);
 
-  // Show rewarded ad (for revive)
+  // Mock rewarded ad - immediately triggers reward callback
   const showRewardedAd = useCallback((onReward) => {
-    if (isRewardedLoaded && rewardedRef.current) {
-      const unsubscribe = rewardedRef.current.addAdEventListener(
-        RewardedAdEventType.EARNED_REWARD,
-        () => {
-          onReward && onReward();
-          unsubscribe();
-        }
-      );
-      rewardedRef.current.show();
-      return true;
-    }
-    console.log('[AdsManager] Rewarded ad not ready');
-    return false;
-  }, [isRewardedLoaded]);
+    console.log('[MockAds] Rewarded ad displayed (mocked)');
+    // Simulate watching an ad with a short delay
+    setTimeout(() => {
+      console.log('[MockAds] Reward earned!');
+      onReward && onReward();
+    }, 500);
+    return true;
+  }, []);
 
-  // Remove ads (purchased)
+  // Remove ads (for premium purchase)
   const removeAds = useCallback(async () => {
     setAdsRemoved(true);
     setShowBanner(false);
     await AsyncStorage.setItem('flappyfish_ads_removed', 'true');
-    console.log('[AdsManager] Ads removed - Premium user');
+    console.log('[MockAds] Ads removed - Premium user');
   }, []);
 
-  // Hide/show banner
+  // Hide/show banner controls
   const hideBanner = useCallback(() => {
     if (!adsRemoved) setShowBanner(false);
   }, [adsRemoved]);
@@ -179,7 +87,8 @@ export const AdsProvider = ({ children }) => {
     removeAds,
     hideBanner,
     showBannerAd,
-    bannerAdUnitId: getAdUnitId('BANNER'),
+    // Mock banner unit ID
+    bannerAdUnitId: 'mock-banner-id',
   };
 
   return <AdsContext.Provider value={value}>{children}</AdsContext.Provider>;
