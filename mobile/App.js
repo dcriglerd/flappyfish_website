@@ -7,10 +7,11 @@ import FlappyFishGame from './src/screens/FlappyFishGame';
 import { AdsProvider } from './src/context/AdsContext';
 import { GameProvider } from './src/context/GameContext';
 import { AudioProvider } from './src/context/AudioContext';
+import { PurchasesProvider } from './src/context/PurchasesContext';
 
 export default function App() {
   const [isReady, setIsReady] = useState(false);
-  const [initError, setInitError] = useState(null);
+  const [initStatus, setInitStatus] = useState('Loading...');
 
   useEffect(() => {
     initializeApp();
@@ -18,30 +19,25 @@ export default function App() {
 
   const initializeApp = async () => {
     try {
-      // Configure request settings
+      setInitStatus('Initializing ads...');
+      
+      // Configure ad request settings
       await mobileAds().setRequestConfiguration({
-        // Maximum ad content rating (G = General audiences)
         maxAdContentRating: 'G',
-        // Tag for child-directed treatment
         tagForChildDirectedTreatment: false,
-        // Tag for users under age of consent
         tagForUnderAgeOfConsent: false,
-        // Test device identifiers - 'EMULATOR' works for all emulators/simulators
         testDeviceIdentifiers: ['EMULATOR'],
       });
 
-      console.log('[App] Request configuration set');
-
       // Initialize Google Mobile Ads SDK
-      const adapterStatuses = await mobileAds().initialize();
+      await mobileAds().initialize();
       console.log('[App] Google Mobile Ads SDK initialized');
-      console.log('[App] Adapter statuses:', JSON.stringify(adapterStatuses, null, 2));
 
+      setInitStatus('Ready!');
       setIsReady(true);
     } catch (error) {
       console.error('[App] Initialization error:', error);
-      setInitError(error.message);
-      // Continue anyway - ads will just not work
+      // Continue anyway
       setIsReady(true);
     }
   };
@@ -49,8 +45,8 @@ export default function App() {
   if (!isReady) {
     return (
       <View style={styles.loadingContainer}>
-        <Text style={styles.loadingText}>🐠 Loading...</Text>
-        <Text style={styles.loadingSubtext}>Initializing ads...</Text>
+        <Text style={styles.loadingText}>🐠 Flappy Fish</Text>
+        <Text style={styles.loadingSubtext}>{initStatus}</Text>
       </View>
     );
   }
@@ -58,13 +54,15 @@ export default function App() {
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar style="light" />
-      <AudioProvider>
-        <AdsProvider>
-          <GameProvider>
-            <FlappyFishGame />
-          </GameProvider>
-        </AdsProvider>
-      </AudioProvider>
+      <PurchasesProvider>
+        <AudioProvider>
+          <AdsProvider>
+            <GameProvider>
+              <FlappyFishGame />
+            </GameProvider>
+          </AdsProvider>
+        </AudioProvider>
+      </PurchasesProvider>
     </SafeAreaView>
   );
 }
@@ -81,7 +79,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   loadingText: {
-    fontSize: 28,
+    fontSize: 32,
     color: '#ffffff',
     fontWeight: 'bold',
   },
