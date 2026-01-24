@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useState, useCallback, useRef, useEffect } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { GAME_CONFIG } from '../constants/config';
-import { FISH_SKINS } from '../data/gameData';
+import { FISH_SKINS, POWER_UPS } from '../data/gameData';
 
 const GameContext = createContext();
 
@@ -26,7 +26,14 @@ export const GameProvider = ({ children }) => {
   
   // Power-ups state
   const [ownedPowerUps, setOwnedPowerUps] = useState({});
-  const [activePowerUp, setActivePowerUp] = useState(null);
+  // Active power-ups: { powerUpId: { active: boolean, endTime: timestamp } }
+  const [activePowerUps, setActivePowerUps] = useState({});
+  
+  // Shield state (consumed on hit)
+  const [hasShield, setHasShield] = useState(false);
+  
+  // Double coins multiplier
+  const [coinMultiplier, setCoinMultiplier] = useState(1);
 
   const gameRef = useRef({
     fish: { x: 80, y: 200, velocity: 0, rotation: 0 },
@@ -34,11 +41,25 @@ export const GameProvider = ({ children }) => {
     collectibles: [],
     lastObstacleTime: 0,
   });
+  
+  const powerUpTimersRef = useRef({});
 
   // Load saved data on mount
   useEffect(() => {
     loadSavedData();
   }, []);
+
+  // Clear power-up timers on unmount or game end
+  useEffect(() => {
+    if (gameState === 'gameover' || gameState === 'menu') {
+      // Clear all active power-ups
+      Object.values(powerUpTimersRef.current).forEach(timer => clearTimeout(timer));
+      powerUpTimersRef.current = {};
+      setActivePowerUps({});
+      setHasShield(false);
+      setCoinMultiplier(1);
+    }
+  }, [gameState]);
 
   const loadSavedData = async () => {
     try {
@@ -82,7 +103,12 @@ export const GameProvider = ({ children }) => {
     };
     setScore(0);
     setCanRevive(true);
-    setActivePowerUp(null);
+    // Clear power-ups on reset
+    Object.values(powerUpTimersRef.current).forEach(timer => clearTimeout(timer));
+    powerUpTimersRef.current = {};
+    setActivePowerUps({});
+    setHasShield(false);
+    setCoinMultiplier(1);
   }, []);
 
   const startGame = useCallback(() => {
@@ -121,10 +147,12 @@ export const GameProvider = ({ children }) => {
 
   // Coins management
   const addCoins = useCallback(async (amount) => {
-    const newCoins = coins + amount;
+    const actualAmount = amount * coinMultiplier;
+    const newCoins = coins + actualAmount;
     setCoins(newCoins);
     await AsyncStorage.setItem(STORAGE_KEYS.COINS, newCoins.toString());
-  }, [coins]);
+    return actualAmount; // Return actual amount earned (for UI feedback)
+  }, [coins, coinMultiplier]);
 
   const spendCoins = useCallback(async (amount) => {
     if (coins >= amount) {
@@ -180,22 +208,80 @@ export const GameProvider = ({ children }) => {
     return false;
   }, [coins, ownedPowerUps]);
 
-  const usePowerUp = useCallback(async (powerUpId) => {
-    if (ownedPowerUps[powerUpId] > 0) {
-      const newOwnedPowerUps = {
-        ...ownedPowerUps,
-        [powerUpId]: ownedPowerUps[powerUpId] - 1,
-      };
-      
-      setOwnedPowerUps(newOwnedPowerUps);
-      setActivePowerUp(powerUpId);
-      
-      await AsyncStorage.setItem(STORAGE_KEYS.POWER_UPS, JSON.stringify(newOwnedPowerUps));
-      
-      return true;
+  // Activate a power-up during gameplay
+  const activatePowerUp = useCallback(async (powerUpId) => {
+    if ((ownedPowerUps[powerUpId] || 0) <= 0) return false;
+    if (activePowerUps[powerUpId]?.active) return false; // Already active
+    
+    const powerUp = POWER_UPS.find(p => p.id === powerUpId);
+    if (!powerUp) return false;
+
+    // Deduct from inventory
+    const newOwnedPowerUps = {
+      ...ownedPowerUps,
+      [powerUpId]: ownedPowerUps[powerUpId] - 1,
+    };
+    setOwnedPowerUps(newOwnedPowerUps);
+    await AsyncStorage.setItem(STORAGE_KEYS.POWER_UPS, JSON.stringify(newOwnedPowerUps));
+
+    // Activate the power-up
+    const endTime = Date.now() + powerUp.duration;
+    setActivePowerUps(prev => ({
+      ...prev,
+      [powerUpId]: { active: true, endTime },
+    }));
+
+    // Apply effect
+    switch (powerUpId) {
+      case 'bubble_shield':
+        setHasShield(true);
+        break;
+      case 'double_coins':
+        setCoinMultiplier(2);
+        break;
+      // slow_motion and magnet are handled in GameCanvas
     }
-    return false;
-  }, [ownedPowerUps]);
+
+    // Set timer to deactivate
+    powerUpTimersRef.current[powerUpId] = setTimeout(() => {
+      setActivePowerUps(prev => ({
+        ...prev,
+        [powerUpId]: { active: false, endTime: 0 },
+      }));
+      
+      // Remove effect
+      switch (powerUpId) {
+        case 'bubble_shield':
+          setHasShield(false);
+          break;
+        case 'double_coins':
+          setCoinMultiplier(1);
+          break;
+      }
+    }, powerUp.duration);
+
+    console.log(`[PowerUp] Activated ${powerUpId} for ${powerUp.duration}ms`);
+    return true;
+  }, [ownedPowerUps, activePowerUps]);
+
+  // Consume shield (called when player would die but has shield)
+  const consumeShield = useCallback(() => {
+    if (hasShield) {
+      setHasShield(false);
+      // Also mark shield power-up as inactive
+      setActivePowerUps(prev => ({
+        ...prev,
+        bubble_shield: { active: false, endTime: 0 },
+      }));
+      // Clear the timer
+      if (powerUpTimersRef.current.bubble_shield) {
+        clearTimeout(powerUpTimersRef.current.bubble_shield);
+        delete powerUpTimersRef.current.bubble_shield;
+      }
+      return true; // Shield was consumed
+    }
+    return false; // No shield
+  }, [hasShield]);
 
   const flap = useCallback(() => {
     if (gameState === 'playing') {
@@ -231,6 +317,7 @@ export const GameProvider = ({ children }) => {
     // Coins
     addCoins,
     spendCoins,
+    coinMultiplier,
     
     // Skins
     unlockedSkins,
@@ -240,9 +327,13 @@ export const GameProvider = ({ children }) => {
     
     // Power-ups
     ownedPowerUps,
-    activePowerUp,
+    activePowerUps,
     buyPowerUp,
-    usePowerUp,
+    activatePowerUp,
+    
+    // Shield
+    hasShield,
+    consumeShield,
   };
 
   return <GameContext.Provider value={value}>{children}</GameContext.Provider>;
