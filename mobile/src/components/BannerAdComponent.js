@@ -1,23 +1,51 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
+import { BannerAd, BannerAdSize } from 'react-native-google-mobile-ads';
 import { useAds } from '../context/AdsContext';
 import { COLORS } from '../constants/config';
 
 /**
- * MOCKED Banner Ad Component for Expo Go
- * In production builds, this will use react-native-google-mobile-ads
+ * Real Banner Ad Component using Google Mobile Ads SDK
+ * Displays adaptive banner ads at the bottom of the screen
  */
 const BannerAdComponent = () => {
-  const { showBanner } = useAds();
+  const { showBanner, bannerAdUnitId, adsRemoved } = useAds();
+  const [adError, setAdError] = useState(false);
+  const [adLoaded, setAdLoaded] = useState(false);
 
-  if (!showBanner) return null;
+  if (!showBanner || adsRemoved) return null;
+
+  // If ad failed to load, show nothing (graceful degradation)
+  if (adError) {
+    return null;
+  }
 
   return (
     <View style={styles.bannerContainer}>
-      <View style={styles.mockBanner}>
-        <Text style={styles.mockBannerText}>📢 Ad Space (Mocked)</Text>
-        <Text style={styles.mockBannerSubtext}>Real ads in production build</Text>
-      </View>
+      <BannerAd
+        unitId={bannerAdUnitId}
+        size={BannerAdSize.ANCHORED_ADAPTIVE_BANNER}
+        requestOptions={{
+          requestNonPersonalizedAdsOnly: true,
+          keywords: ['game', 'fish', 'arcade', 'fun'],
+        }}
+        onAdLoaded={() => {
+          console.log('[BannerAd] Loaded successfully');
+          setAdLoaded(true);
+          setAdError(false);
+        }}
+        onAdFailedToLoad={(error) => {
+          console.log('[BannerAd] Failed to load:', error);
+          setAdError(true);
+          setAdLoaded(false);
+        }}
+        onAdOpened={() => {
+          console.log('[BannerAd] Opened');
+        }}
+        onAdClosed={() => {
+          console.log('[BannerAd] Closed');
+        }}
+      />
     </View>
   );
 };
@@ -30,24 +58,7 @@ const styles = StyleSheet.create({
     right: 0,
     alignItems: 'center',
     backgroundColor: 'transparent',
-  },
-  mockBanner: {
-    width: '100%',
-    height: 50,
-    backgroundColor: 'rgba(0,0,0,0.8)',
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderTopWidth: 1,
-    borderTopColor: COLORS.GOLD,
-  },
-  mockBannerText: {
-    color: COLORS.GOLD,
-    fontSize: 12,
-    fontWeight: '600',
-  },
-  mockBannerSubtext: {
-    color: 'rgba(255,255,255,0.5)',
-    fontSize: 9,
+    minHeight: 50,
   },
 });
 
