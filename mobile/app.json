@@ -55,8 +55,8 @@
       [
         "react-native-google-mobile-ads",
         {
-          "androidAppId": "ca-app-pub-3940256099942544~3347511713",
-          "iosAppId": "ca-app-pub-3940256099942544~1458002511"
+          "androidAppId": "ca-app-pub-9210526164379066~4938293330",
+          "iosAppId": "ca-app-pub-9210526164379066~4938293330"
         }
       ],
       "expo-dev-client"
@@ -68,7 +68,7 @@
     }
   },
   "react-native-google-mobile-ads": {
-    "android_app_id": "ca-app-pub-3940256099942544~3347511713",
-    "ios_app_id": "ca-app-pub-3940256099942544~1458002511"
+    "android_app_id": "ca-app-pub-9210526164379066~4938293330",
+    "ios_app_id": "ca-app-pub-9210526164379066~4938293330"
   }
 }
