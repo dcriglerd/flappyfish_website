@@ -133,6 +133,14 @@ Located in `/app/mobile/src/constants/config.js`:
   - Shows when app returns from background (30s cooldown)
   - Uses production App Open ad unit ID
 
+- [x] RevenueCat IAP Integration - Dec 2025
+  - Installed `react-native-purchases` SDK
+  - PurchasesContext for state management
+  - Test API key configured: `test_NABQGDjFGFjEYgtuLvYsspaTccY`
+  - Products: coins_100, coins_500, coins_1000, remove_ads
+  - Restore purchases functionality
+  - Updated ShopModal with real IAP integration
+
 ## P2 - Future Tasks
 - [ ] Real payment processor (Stripe/RevenueCat)
 - [ ] Backend for user data persistence
