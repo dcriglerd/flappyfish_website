@@ -509,19 +509,20 @@ const GameCanvas = ({
       game.fish.y += game.fish.velocity;
       game.fish.rotation = Math.min(90, Math.max(-30, game.fish.velocity * 3));
 
-      // Boundary check
-      if (game.fish.y < 0 || game.fish.y > canvas.height - 30) {
+      // Boundary check (ground is at canvas.height - 50)
+      if (game.fish.y < 20 || game.fish.y > canvas.height - 70) {
         if (activePowerUp !== 'bubble_shield') {
           onGameOver();
         } else {
-          game.fish.y = Math.max(20, Math.min(canvas.height - 50, game.fish.y));
+          game.fish.y = Math.max(30, Math.min(canvas.height - 80, game.fish.y));
           game.fish.velocity = 0;
         }
       }
 
       // Spawn obstacles
       if (timestamp - game.lastObstacleTime > GAME_CONFIG.obstacleInterval) {
-        const gapY = 100 + Math.random() * (canvas.height - 250);
+        // Ensure gap is in playable area (not too close to ground)
+        const gapY = 120 + Math.random() * (canvas.height - 300);
         game.obstacles.push({
           x: canvas.width,
           gapY,
