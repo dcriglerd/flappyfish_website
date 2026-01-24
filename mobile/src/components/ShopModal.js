@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -7,11 +7,47 @@ import {
   TouchableOpacity,
   ScrollView,
   Dimensions,
+  ActivityIndicator,
 } from 'react-native';
 import { COLORS } from '../constants/config';
-import { SHOP_ITEMS, POWER_UPS } from '../data/gameData';
+import { POWER_UPS } from '../data/gameData';
+import { usePurchases, PRODUCT_IDS } from '../context/PurchasesContext';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
+
+// Shop items with RevenueCat product IDs
+const COIN_PACKAGES = [
+  {
+    id: PRODUCT_IDS.COINS_100,
+    name: '100 Coins',
+    coins: 100,
+    fallbackPrice: '$0.99',
+    popular: false,
+  },
+  {
+    id: PRODUCT_IDS.COINS_500,
+    name: '500 Coins',
+    coins: 500,
+    bonus: '+50 Bonus',
+    fallbackPrice: '$3.99',
+    popular: true,
+  },
+  {
+    id: PRODUCT_IDS.COINS_1000,
+    name: '1000 Coins',
+    coins: 1000,
+    bonus: '+200 Bonus',
+    fallbackPrice: '$6.99',
+    popular: false,
+  },
+];
+
+const REMOVE_ADS_ITEM = {
+  id: PRODUCT_IDS.REMOVE_ADS,
+  name: 'Remove Ads',
+  description: 'Play without interruptions',
+  fallbackPrice: '$2.99',
+};
 
 const ShopModal = ({ 
   visible, 
@@ -24,31 +60,89 @@ const ShopModal = ({
 }) => {
   const [activeTab, setActiveTab] = useState('coins');
   const [message, setMessage] = useState(null);
+  
+  const {
+    isInitialized,
+    isPurchasing,
+    purchaseProduct,
+    restorePurchases,
+    getProductPrice,
+    hasRemovedAds,
+    getAvailablePackages,
+  } = usePurchases();
+
+  // Update adsRemoved state from RevenueCat
+  useEffect(() => {
+    if (hasRemovedAds() && !adsRemoved) {
+      onRemoveAds();
+    }
+  }, [hasRemovedAds, adsRemoved, onRemoveAds]);
 
   const showMessage = (text, isError = false) => {
     setMessage({ text, isError });
-    setTimeout(() => setMessage(null), 2000);
+    setTimeout(() => setMessage(null), 3000);
   };
 
-  const handlePurchase = (item) => {
-    if (item.type === 'coins') {
-      // Simulate purchase - in production, integrate with RevenueCat/Stripe
+  const handlePurchaseCoinPackage = async (item) => {
+    if (isPurchasing) return;
+
+    const result = await purchaseProduct(item.id);
+    
+    if (result.success) {
+      // Grant coins
       const bonusCoins = item.bonus ? parseInt(item.bonus.replace(/[^0-9]/g, '')) : 0;
       onPurchaseCoins(item.coins + bonusCoins);
-      showMessage(`Purchased ${item.name}!`);
-    } else if (item.type === 'premium') {
+      showMessage(`🎉 Purchased ${item.name}!`);
+    } else if (result.cancelled) {
+      // User cancelled - do nothing
+    } else {
+      showMessage(result.error || 'Purchase failed', true);
+    }
+  };
+
+  const handleRemoveAds = async () => {
+    if (isPurchasing || adsRemoved) return;
+
+    const result = await purchaseProduct(PRODUCT_IDS.REMOVE_ADS);
+    
+    if (result.success) {
       onRemoveAds();
-      showMessage('Ads removed! Enjoy ad-free gameplay!');
+      showMessage('🎉 Ads removed! Enjoy ad-free gameplay!');
+    } else if (!result.cancelled) {
+      showMessage(result.error || 'Purchase failed', true);
+    }
+  };
+
+  const handleRestorePurchases = async () => {
+    const result = await restorePurchases();
+    
+    if (result.success) {
+      if (result.hasEntitlements) {
+        showMessage('✅ Purchases restored successfully!');
+        if (hasRemovedAds()) {
+          onRemoveAds();
+        }
+      } else {
+        showMessage('No previous purchases found', true);
+      }
+    } else {
+      showMessage(result.error || 'Restore failed', true);
     }
   };
 
   const handleBuyPowerUp = (powerUp) => {
     if (coins >= powerUp.cost) {
       onBuyPowerUp(powerUp);
-      showMessage(`${powerUp.name} ready to use!`);
+      showMessage(`⚡ ${powerUp.name} ready to use!`);
     } else {
       showMessage('Not enough coins!', true);
     }
+  };
+
+  // Get price from RevenueCat or use fallback
+  const getPrice = (productId, fallback) => {
+    const price = getProductPrice(productId);
+    return price || fallback;
   };
 
   return (
@@ -94,12 +188,18 @@ const ShopModal = ({
             </TouchableOpacity>
           </View>
 
+          {/* Loading indicator */}
+          {isPurchasing && (
+            <View style={styles.loadingOverlay}>
+              <ActivityIndicator size="large" color={COLORS.GOLD} />
+              <Text style={styles.loadingText}>Processing...</Text>
+            </View>
+          )}
+
           {/* Message */}
           {message && (
             <View style={[styles.message, message.isError && styles.messageError]}>
-              <Text style={styles.messageText}>
-                {message.isError ? '❌' : '✅'} {message.text}
-              </Text>
+              <Text style={styles.messageText}>{message.text}</Text>
             </View>
           )}
 
@@ -107,7 +207,8 @@ const ShopModal = ({
           <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
             {activeTab === 'coins' && (
               <View style={styles.itemList}>
-                {SHOP_ITEMS.map((item) => (
+                {/* Coin Packages */}
+                {COIN_PACKAGES.map((item) => (
                   <View
                     key={item.id}
                     style={[styles.item, item.popular && styles.itemPopular]}
@@ -122,24 +223,49 @@ const ShopModal = ({
                       {item.bonus && (
                         <Text style={styles.itemBonus}>{item.bonus}</Text>
                       )}
-                      {item.description && (
-                        <Text style={styles.itemDesc}>{item.description}</Text>
-                      )}
                     </View>
                     <TouchableOpacity
-                      style={[
-                        styles.buyButton,
-                        item.type === 'premium' && adsRemoved && styles.buyButtonDisabled,
-                      ]}
-                      onPress={() => handlePurchase(item)}
-                      disabled={item.type === 'premium' && adsRemoved}
+                      style={styles.buyButton}
+                      onPress={() => handlePurchaseCoinPackage(item)}
+                      disabled={isPurchasing}
                     >
                       <Text style={styles.buyButtonText}>
-                        {item.type === 'premium' && adsRemoved ? '✓ Owned' : item.price}
+                        {getPrice(item.id, item.fallbackPrice)}
                       </Text>
                     </TouchableOpacity>
                   </View>
                 ))}
+
+                {/* Remove Ads */}
+                <View style={styles.item}>
+                  <View style={styles.itemInfo}>
+                    <Text style={styles.itemName}>{REMOVE_ADS_ITEM.name}</Text>
+                    <Text style={styles.itemDesc}>{REMOVE_ADS_ITEM.description}</Text>
+                  </View>
+                  <TouchableOpacity
+                    style={[
+                      styles.buyButton,
+                      (adsRemoved || hasRemovedAds()) && styles.buyButtonDisabled,
+                    ]}
+                    onPress={handleRemoveAds}
+                    disabled={isPurchasing || adsRemoved || hasRemovedAds()}
+                  >
+                    <Text style={styles.buyButtonText}>
+                      {adsRemoved || hasRemovedAds() 
+                        ? '✓ Owned' 
+                        : getPrice(REMOVE_ADS_ITEM.id, REMOVE_ADS_ITEM.fallbackPrice)}
+                    </Text>
+                  </TouchableOpacity>
+                </View>
+
+                {/* Restore Purchases */}
+                <TouchableOpacity
+                  style={styles.restoreButton}
+                  onPress={handleRestorePurchases}
+                  disabled={isPurchasing}
+                >
+                  <Text style={styles.restoreText}>Restore Purchases</Text>
+                </TouchableOpacity>
               </View>
             )}
 
@@ -166,6 +292,10 @@ const ShopModal = ({
                     </TouchableOpacity>
                   </View>
                 ))}
+
+                <Text style={styles.hintText}>
+                  💡 Power-ups are purchased with in-game coins
+                </Text>
               </View>
             )}
           </ScrollView>
@@ -262,6 +392,22 @@ const styles = StyleSheet.create({
   },
   activeTabText: {
     color: COLORS.WHITE,
+  },
+  loadingOverlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex: 100,
+  },
+  loadingText: {
+    color: COLORS.WHITE,
+    marginTop: 10,
+    fontWeight: '600',
   },
   message: {
     marginHorizontal: 16,
@@ -367,6 +513,22 @@ const styles = StyleSheet.create({
     color: COLORS.WHITE,
     fontWeight: '700',
     fontSize: 15,
+  },
+  restoreButton: {
+    marginTop: 8,
+    paddingVertical: 12,
+    alignItems: 'center',
+  },
+  restoreText: {
+    color: 'rgba(255,255,255,0.7)',
+    fontSize: 14,
+    textDecorationLine: 'underline',
+  },
+  hintText: {
+    color: 'rgba(255,255,255,0.5)',
+    fontSize: 13,
+    textAlign: 'center',
+    marginTop: 12,
   },
 });
 
