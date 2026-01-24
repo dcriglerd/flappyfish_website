@@ -4,22 +4,34 @@
 
 export const AD_CONFIG = {
   // Use test IDs during development (set to false for production)
-  USE_TEST_IDS: true,
+  USE_TEST_IDS: false,
 
-  // Production Ad Unit IDs (replace with your real AdMob IDs)
-  // Create these at https://admob.google.com
+  // Production Ad Unit IDs from AdMob
   PRODUCTION_IDS: {
     BANNER: {
-      ANDROID: 'ca-app-pub-XXXXXXXXXXXXXXXX/XXXXXXXXXX',
-      IOS: 'ca-app-pub-XXXXXXXXXXXXXXXX/XXXXXXXXXX',
+      ANDROID: 'ca-app-pub-9210526164379066/2829853361',
+      IOS: 'ca-app-pub-9210526164379066/2829853361',
     },
     INTERSTITIAL: {
-      ANDROID: 'ca-app-pub-XXXXXXXXXXXXXXXX/XXXXXXXXXX',
-      IOS: 'ca-app-pub-XXXXXXXXXXXXXXXX/XXXXXXXXXX',
+      ANDROID: 'ca-app-pub-9210526164379066/1429141788',
+      IOS: 'ca-app-pub-9210526164379066/1429141788',
     },
     REWARDED: {
-      ANDROID: 'ca-app-pub-XXXXXXXXXXXXXXXX/XXXXXXXXXX',
-      IOS: 'ca-app-pub-XXXXXXXXXXXXXXXX/XXXXXXXXXX',
+      ANDROID: 'ca-app-pub-9210526164379066/7004902096',
+      IOS: 'ca-app-pub-9210526164379066/7004902096',
+    },
+    // Additional ad formats (can be used later)
+    REWARDED_INTERSTITIAL: {
+      ANDROID: 'ca-app-pub-9210526164379066/4977504552',
+      IOS: 'ca-app-pub-9210526164379066/4977504552',
+    },
+    APP_OPEN: {
+      ANDROID: 'ca-app-pub-9210526164379066/3250641298',
+      IOS: 'ca-app-pub-9210526164379066/3250641298',
+    },
+    NATIVE: {
+      ANDROID: 'ca-app-pub-9210526164379066/6204107699',
+      IOS: 'ca-app-pub-9210526164379066/6204107699',
     },
   },
 
