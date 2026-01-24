@@ -1,116 +1,161 @@
 # 🐠 Flappy Fish Mobile
 
-A fun underwater Flappy Bird clone built with React Native and Expo!
+A fun underwater Flappy Bird clone built with React Native and Expo, featuring **real Google AdMob integration**!
 
-## 🚀 Quick Start (Expo Go)
+## 🚀 Quick Start
 
 ### Prerequisites
-- Install **Expo Go** app on your phone:
-  - [Android Play Store](https://play.google.com/store/apps/details?id=host.exp.exponent)
-  - [iOS App Store](https://apps.apple.com/app/expo-go/id982107779)
+- **Node.js** 18+ installed
+- **EAS CLI** installed: `npm install -g eas-cli`
+- **Expo account**: Sign up at [expo.dev](https://expo.dev)
+- For iOS builds: Mac with Xcode installed
+- For Android builds: Android Studio (optional for local builds)
 
-### Run the Game
+### Building the App
 
-1. **Navigate to the mobile folder:**
-   ```bash
-   cd /app/mobile
+This app uses **Expo Development Builds** with native Google Mobile Ads SDK.
+
+#### 1. Login to Expo
+```bash
+eas login
+```
+
+#### 2. Configure your project (first time only)
+```bash
+cd /app/mobile
+eas build:configure
+```
+
+#### 3. Build for Android
+```bash
+# Development build (for testing with dev tools)
+eas build --platform android --profile development
+
+# Preview build (standalone APK for testing)
+eas build --platform android --profile preview
+
+# Production build (for Play Store)
+eas build --platform android --profile production
+```
+
+#### 4. Build for iOS
+```bash
+# Development build (simulator)
+eas build --platform ios --profile development
+
+# Production build (for App Store)
+eas build --platform ios --profile production
+```
+
+#### 5. Install and Run
+After the build completes:
+- Download the APK/IPA from the Expo dashboard
+- Install on your device
+- Start the dev server: `npx expo start --dev-client`
+
+## 📢 Google AdMob Integration
+
+This app includes **real Google AdMob** integration with:
+- ✅ **Banner Ads** - Shown at bottom of menu screens
+- ✅ **Interstitial Ads** - Shown every 3 game overs
+- ✅ **Rewarded Ads** - Watch to revive after death
+
+### Test Ads (Default)
+The app is configured to use **Google's test ad unit IDs** by default. These show test advertisements that are safe for development.
+
+### Production Ads
+To use your own AdMob ads:
+
+1. Create an [AdMob account](https://admob.google.com)
+2. Register your app and create ad units
+3. Update `app.json` with your **App IDs**:
+   ```json
+   "react-native-google-mobile-ads": {
+     "android_app_id": "ca-app-pub-YOUR_APP_ID",
+     "ios_app_id": "ca-app-pub-YOUR_APP_ID"
+   }
    ```
-
-2. **Start the Expo development server:**
-   ```bash
-   npx expo start
-   ```
-
-3. **Scan the QR code** with:
-   - **Android:** Expo Go app's QR scanner
-   - **iOS:** Camera app (will open Expo Go)
-
-4. **Play!** Tap the screen to make the fish swim!
+4. Update `src/constants/config.js` with your **Ad Unit IDs**
+5. Set `USE_TEST_IDS: false` in config.js
+6. Rebuild the app
 
 ## 🎮 How to Play
 
-- **Tap** anywhere on the screen to make the fish swim upward
+- **Tap** anywhere to make the fish swim upward
 - Avoid the coral reef obstacles
 - Collect coins to increase your score
-- Try to beat your high score!
+- Watch ads to revive after death!
 
 ## 🎯 Features
 
 - ✅ Smooth 60fps gameplay
-- ✅ Haptic feedback on tap
-- ✅ Animated underwater background with bubbles
+- ✅ Haptic feedback
+- ✅ Sound effects (flap, coin, score, game over)
+- ✅ Animated underwater background
 - ✅ High score tracking (saved locally)
 - ✅ Coin collection system
-- ✅ Watch ad to revive (mocked for Expo Go)
-- ✅ Beautiful 2D fish character with SVG graphics
+- ✅ Real Google AdMob integration
+- ✅ Mute toggle
 
-## 📱 Tested With
-
-- Expo SDK 50
-- React Native 0.73.6
-- Expo Go app
-
-## 🔧 Project Structure
+## 📁 Project Structure
 
 ```
 mobile/
-├── App.js                    # Entry point
+├── App.js                    # Entry point + Ads SDK init
+├── app.json                  # Expo config + AdMob App IDs
+├── eas.json                  # EAS Build configuration
+├── assets/
+│   └── sounds/               # Game audio files
 ├── src/
 │   ├── components/
-│   │   ├── Background.js     # Animated underwater background
-│   │   ├── Fish.js           # SVG fish character
-│   │   ├── Obstacle.js       # Coral reef obstacles
+│   │   ├── Background.js     # Animated underwater scene
+│   │   ├── Fish.js           # SVG fish character  
+│   │   ├── Obstacle.js       # Coral reef pipes
 │   │   ├── Coin.js           # Collectible coins
-│   │   ├── GameCanvas.js     # Main game loop & rendering
-│   │   ├── GameUI.js         # Score display & pause
+│   │   ├── GameCanvas.js     # Main game loop
+│   │   ├── GameUI.js         # HUD (score, pause, mute)
 │   │   ├── StartScreen.js    # Main menu
-│   │   ├── GameOverScreen.js # Game over modal
-│   │   └── BannerAdComponent.js  # Mocked ads
+│   │   ├── GameOverScreen.js # End game modal
+│   │   └── BannerAdComponent.js  # Google AdMob banner
 │   ├── context/
-│   │   ├── GameContext.js    # Game state management
-│   │   └── AdsContext.js     # Mocked ads provider
+│   │   ├── GameContext.js    # Game state
+│   │   ├── AdsContext.js     # AdMob management
+│   │   └── AudioContext.js   # Sound effects
+│   ├── hooks/
+│   │   └── useGameAudio.js   # Audio playback
 │   ├── constants/
-│   │   └── config.js         # Game configuration
+│   │   └── config.js         # Game + Ad config
 │   └── screens/
-│       └── FlappyFishGame.js # Main game screen
-├── assets/                   # App icons & splash
+│       └── FlappyFishGame.js # Main screen
 └── package.json
 ```
 
-## 🎨 Game Configuration
+## 🔧 Configuration
 
-Edit `src/constants/config.js` to adjust:
+### Game Settings (`src/constants/config.js`)
 - `GRAVITY` - How fast the fish falls
 - `FLAP_FORCE` - How high each tap makes the fish swim
 - `OBSTACLE_SPEED` - How fast obstacles move
 - `GAP_HEIGHT` - Size of the gap between obstacles
+- `INTERSTITIAL_FREQUENCY` - Show interstitial every N deaths
 
-## 📢 Ads (Production)
+### Ad Settings
+- `USE_TEST_IDS` - Use test ads (true) or production (false)
+- `PRODUCTION_IDS` - Your AdMob ad unit IDs
 
-The current build uses **mocked ads** for Expo Go compatibility.
+## 🛠️ Troubleshooting
 
-For real Google AdMob integration in production builds:
-1. Create an [AdMob account](https://admob.google.com/)
-2. Get your Ad Unit IDs
-3. Create a development build with `react-native-google-mobile-ads`
-4. Update `src/constants/config.js` with your Ad Unit IDs
+### Ads not showing?
+1. Ensure you're using a **development build** (not Expo Go)
+2. Check console logs for ad loading errors
+3. Verify your AdMob account is active
+4. New ad units may take a few hours to serve ads
 
-## 🛠️ Building for Production
-
-```bash
-# Install EAS CLI
-npm install -g eas-cli
-
-# Login to Expo
-eas login
-
-# Build for Android
-eas build --platform android
-
-# Build for iOS  
-eas build --platform ios
-```
+### Build failing?
+1. Clear cache: `npx expo prebuild --clean`
+2. Delete node_modules: `rm -rf node_modules && yarn install`
+3. Check EAS build logs for specific errors
 
 ---
 
-Made with 💙 by Emergent Labs
+Made with 💙 using Expo + React Native + Google AdMob
