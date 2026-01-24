@@ -105,6 +105,22 @@ Located in `/app/mobile/src/constants/config.js`:
   - Game over descending tone
   - Mute toggle on StartScreen and GameUI
 
+- [x] Google AdMob Integration - Dec 2025
+  - Banner, Interstitial, Rewarded ads
+  - Production Ad Unit IDs configured
+
+- [x] Shop Modal - Dec 2025
+  - Coin packages (100/500/1000 coins)
+  - Remove Ads option
+  - Power-ups (Bubble Shield, Slow Motion, Coin Magnet, Double Coins)
+  - Tab-based UI (Coins / Power-ups)
+
+- [x] Skins Modal - Dec 2025
+  - 6 fish skins (Goldie, Nemo, Azure, Mystic, Prisma, Emerald)
+  - Unlock with coins
+  - Select/equip skins
+  - SVG fish preview with color
+
 ## P2 - Future Tasks
 - [ ] Real payment processor (Stripe/RevenueCat)
 - [ ] Backend for user data persistence
