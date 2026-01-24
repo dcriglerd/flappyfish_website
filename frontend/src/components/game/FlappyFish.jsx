@@ -193,10 +193,10 @@ const FlappyFish = () => {
           </>
         )}
 
-        {/* Menu Screen */}
+        {/* Start Screen */}
         {gameState === 'menu' && (
-          <MenuScreen
-            onStartGame={handleStartGame}
+          <StartScreen
+            onStart={handleStartGame}
             onOpenShop={() => setShowShop(true)}
             onOpenSkins={() => setShowSkins(true)}
             highScore={highScore}
@@ -249,14 +249,6 @@ const FlappyFish = () => {
           unlockedSkins={unlockedSkins}
         />
       </div>
-
-      {/* Instructions - only show on menu */}
-      {gameState === 'menu' && (
-        <div className="absolute bottom-20 left-1/2 -translate-x-1/2 text-white/50 text-sm text-center">
-          <p>Tap or Click to swim!</p>
-          <p className="text-xs mt-1">Avoid obstacles and predators</p>
-        </div>
-      )}
 
       {/* Custom CSS for animations */}
       <style>{`
