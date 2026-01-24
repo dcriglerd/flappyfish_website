@@ -36,11 +36,11 @@ const useGameEngine = (canvasRef) => {
 
   const resetGame = useCallback(() => {
     gameRef.current = {
-      fish: { x: 150, y: 400, velocity: 0, rotation: 0 }, // Adjusted for larger canvas (1200x900)
+      fish: { x: 80, y: 200, velocity: 0, rotation: 0 }, // Adjusted for smaller canvas (600x450)
       obstacles: [],
       collectibles: [],
       enemy: null,
-      lastObstacleTime: 0, // Will spawn first obstacle after interval
+      lastObstacleTime: 0,
       animationFrame: null,
       bubbles: [],
     };
