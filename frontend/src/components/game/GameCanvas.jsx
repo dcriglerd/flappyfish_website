@@ -33,54 +33,106 @@ const GameCanvas = ({
     ctx.translate(fish.x, fish.y);
     ctx.rotate(fish.rotation * Math.PI / 180);
 
-    // Fish body
-    const gradient = ctx.createRadialGradient(0, 0, 5, 0, 0, 25);
-    gradient.addColorStop(0, getSkinColor());
-    gradient.addColorStop(1, '#CC7700');
-    
-    ctx.fillStyle = gradient;
-    ctx.beginPath();
-    ctx.ellipse(0, 0, 25, 18, 0, 0, Math.PI * 2);
-    ctx.fill();
+    const baseColor = getSkinColor();
+    const darkerColor = selectedSkin?.color === 'rainbow' ? '#CC7700' : shadeColor(baseColor, -30);
 
-    // Tail
-    ctx.fillStyle = getSkinColor();
+    // 2D Flat Fish Style - Main body (oval)
+    ctx.fillStyle = baseColor;
+    ctx.strokeStyle = darkerColor;
+    ctx.lineWidth = 3;
+    
+    // Body
+    ctx.beginPath();
+    ctx.ellipse(0, 0, 28, 20, 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.stroke();
+
+    // Tail fin (triangle)
+    ctx.fillStyle = darkerColor;
     ctx.beginPath();
     ctx.moveTo(-25, 0);
-    ctx.lineTo(-40, -15);
-    ctx.lineTo(-40, 15);
+    ctx.lineTo(-42, -18);
+    ctx.lineTo(-42, 18);
     ctx.closePath();
     ctx.fill();
+    ctx.stroke();
 
-    // Fin
+    // Top fin
+    ctx.fillStyle = darkerColor;
     ctx.beginPath();
-    ctx.moveTo(0, -15);
-    ctx.lineTo(10, -30);
-    ctx.lineTo(-10, -15);
+    ctx.moveTo(-5, -18);
+    ctx.lineTo(5, -32);
+    ctx.lineTo(15, -18);
     ctx.closePath();
     ctx.fill();
+    ctx.stroke();
 
-    // Eye
-    ctx.fillStyle = '#fff';
+    // Bottom fin
     ctx.beginPath();
-    ctx.arc(12, -5, 8, 0, Math.PI * 2);
+    ctx.moveTo(0, 18);
+    ctx.lineTo(8, 28);
+    ctx.lineTo(15, 18);
+    ctx.closePath();
     ctx.fill();
-    ctx.fillStyle = '#000';
+    ctx.stroke();
+
+    // Belly stripe (lighter)
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.4)';
     ctx.beginPath();
-    ctx.arc(14, -5, 4, 0, Math.PI * 2);
+    ctx.ellipse(5, 8, 18, 8, 0, 0, Math.PI * 2);
     ctx.fill();
+
+    // Eye white (large, cartoon style)
+    ctx.fillStyle = '#FFFFFF';
+    ctx.strokeStyle = '#333';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.arc(12, -3, 10, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.stroke();
+
+    // Pupil (black)
+    ctx.fillStyle = '#000000';
+    ctx.beginPath();
+    ctx.arc(15, -3, 5, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Eye shine
+    ctx.fillStyle = '#FFFFFF';
+    ctx.beginPath();
+    ctx.arc(13, -6, 2, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Lips/mouth
+    ctx.strokeStyle = darkerColor;
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.arc(26, 5, 5, 0.2 * Math.PI, 0.8 * Math.PI);
+    ctx.stroke();
 
     // Bubble shield effect
     if (activePowerUp === 'bubble_shield') {
-      ctx.strokeStyle = 'rgba(100, 200, 255, 0.6)';
-      ctx.lineWidth = 3;
+      ctx.strokeStyle = 'rgba(100, 220, 255, 0.7)';
+      ctx.lineWidth = 4;
+      ctx.setLineDash([8, 4]);
       ctx.beginPath();
-      ctx.arc(0, 0, 35, 0, Math.PI * 2);
+      ctx.arc(0, 0, 40, 0, Math.PI * 2);
       ctx.stroke();
+      ctx.setLineDash([]);
     }
 
     ctx.restore();
-  }, [getSkinColor, activePowerUp]);
+  }, [getSkinColor, activePowerUp, selectedSkin]);
+
+  // Helper to darken/lighten colors
+  const shadeColor = (color, percent) => {
+    const num = parseInt(color.replace('#', ''), 16);
+    const amt = Math.round(2.55 * percent);
+    const R = (num >> 16) + amt;
+    const G = (num >> 8 & 0x00FF) + amt;
+    const B = (num & 0x0000FF) + amt;
+    return '#' + (0x1000000 + (R < 255 ? R < 1 ? 0 : R : 255) * 0x10000 + (G < 255 ? G < 1 ? 0 : G : 255) * 0x100 + (B < 255 ? B < 1 ? 0 : B : 255)).toString(16).slice(1);
+  };
 
   const drawObstacle = useCallback((ctx, obstacle) => {
     const pipeWidth = 70;
