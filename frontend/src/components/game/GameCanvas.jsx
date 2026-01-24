@@ -380,27 +380,32 @@ const GameCanvas = ({
       const fishY = 80 + (i % 3) * 70 + Math.sin(time + i) * 15;
       drawSmallFish(ctx, fishX, fishY, 12 + (i % 2) * 5, 'rgba(100, 180, 220, 0.5)');
     }
-      drawSmallFish(ctx, fishX, fishY, 15 + (i % 2) * 5, 'rgba(100, 150, 200, 0.4)');
-    }
 
-    // Rising bubbles (medium speed)
-    ctx.fillStyle = 'rgba(255, 255, 255, 0.3)';
-    for (let i = 0; i < 25; i++) {
-      const bubbleX = ((i * 45 + offset * 0.1) % canvas.width);
-      const bubbleY = canvas.height - ((time * 50 + i * 35) % (canvas.height + 50));
-      const bubbleSize = 2 + Math.sin(i + time * 2) * 2;
+    // LOTS of rising bubbles - bright and visible
+    for (let i = 0; i < 40; i++) {
+      const bubbleX = ((i * 28 + offset * 0.15) % canvas.width);
+      const bubbleY = canvas.height - ((time * 45 + i * 25) % (canvas.height + 80));
+      const bubbleSize = 3 + Math.sin(i + time * 1.5) * 3;
+      
+      // Bubble body with gradient effect
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.5)';
       ctx.beginPath();
       ctx.arc(bubbleX, bubbleY, bubbleSize, 0, Math.PI * 2);
       ctx.fill();
-      // Bubble highlight
-      ctx.fillStyle = 'rgba(255, 255, 255, 0.5)';
+      
+      // Bubble outline
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.7)';
+      ctx.lineWidth = 1;
+      ctx.stroke();
+      
+      // Bubble shine/highlight
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
       ctx.beginPath();
-      ctx.arc(bubbleX - bubbleSize * 0.3, bubbleY - bubbleSize * 0.3, bubbleSize * 0.3, 0, Math.PI * 2);
+      ctx.arc(bubbleX - bubbleSize * 0.3, bubbleY - bubbleSize * 0.3, bubbleSize * 0.35, 0, Math.PI * 2);
       ctx.fill();
-      ctx.fillStyle = 'rgba(255, 255, 255, 0.3)';
     }
 
-    // Foreground coral reef (fastest parallax)
+    // Foreground coral reef
     drawCoralReef(ctx, canvas, offset, time);
 
     // Sandy ocean floor
