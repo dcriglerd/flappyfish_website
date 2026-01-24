@@ -6,34 +6,36 @@ import {
   TouchableOpacity,
   Dimensions,
 } from 'react-native';
+import Svg, { Ellipse, Polygon, Circle } from 'react-native-svg';
 import { COLORS } from '../constants/config';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
-const StartScreen = ({ onStart, onOpenShop, onOpenSkins, highScore, coins }) => {
+const StartScreen = ({ onStart, onOpenShop, onOpenSkins, highScore, coins, isMuted, onToggleMute }) => {
   return (
     <View style={styles.container}>
-      {/* Background bubbles effect */}
-      <View style={styles.bubblesContainer}>
-        {Array.from({ length: 15 }).map((_, i) => (
-          <View
-            key={i}
-            style={[
-              styles.bubble,
-              {
-                left: `${Math.random() * 100}%`,
-                bottom: `${Math.random() * 100}%`,
-                width: 10 + Math.random() * 20,
-                height: 10 + Math.random() * 20,
-              },
-            ]}
-          />
-        ))}
-      </View>
+      {/* Sound toggle in corner */}
+      {onToggleMute && (
+        <TouchableOpacity style={styles.soundButton} onPress={onToggleMute}>
+          <Text style={styles.soundIcon}>{isMuted ? '🔇' : '🔊'}</Text>
+        </TouchableOpacity>
+      )}
 
-      {/* Title */}
+      {/* Title with Fish */}
       <View style={styles.titleContainer}>
-        <Text style={styles.fishEmoji}>🐠</Text>
+        {/* Animated Fish SVG */}
+        <View style={styles.fishContainer}>
+          <Svg width={60} height={45} viewBox="0 0 80 60">
+            <Ellipse cx="40" cy="30" rx="28" ry="20" fill={COLORS.GOLD} stroke="#CC9900" strokeWidth="3" />
+            <Polygon points="12,30 -8,12 -8,48" fill="#FFA500" stroke="#CC7700" strokeWidth="2" />
+            <Polygon points="35,10 45,-5 55,10" fill="#FFA500" stroke="#CC7700" strokeWidth="2" />
+            <Ellipse cx="48" cy="38" rx="16" ry="9" fill="rgba(255,255,255,0.4)" />
+            <Circle cx="55" cy="25" r="10" fill="white" stroke="#333" strokeWidth="2" />
+            <Circle cx="58" cy="25" r="5" fill="black" />
+            <Circle cx="56" cy="22" r="2.5" fill="white" />
+          </Svg>
+        </View>
+
         <View>
           <Text style={styles.titleFlappy}>FLAPPY</Text>
           <Text style={styles.titleFish}>FISH</Text>
@@ -54,15 +56,15 @@ const StartScreen = ({ onStart, onOpenShop, onOpenSkins, highScore, coins }) => 
 
       {/* Buttons */}
       <View style={styles.buttonsContainer}>
-        <TouchableOpacity style={styles.startButton} onPress={onStart}>
+        <TouchableOpacity style={styles.startButton} onPress={onStart} activeOpacity={0.8}>
           <Text style={styles.startButtonText}>▶ START</Text>
         </TouchableOpacity>
 
         <View style={styles.bottomButtons}>
-          <TouchableOpacity style={styles.shopButton} onPress={onOpenShop}>
+          <TouchableOpacity style={styles.shopButton} onPress={onOpenShop} activeOpacity={0.8}>
             <Text style={styles.buttonText}>🛍 Shop</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.skinsButton} onPress={onOpenSkins}>
+          <TouchableOpacity style={styles.skinsButton} onPress={onOpenSkins} activeOpacity={0.8}>
             <Text style={styles.buttonText}>✨ Skins</Text>
           </TouchableOpacity>
         </View>
@@ -84,23 +86,27 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     paddingHorizontal: 20,
   },
-  bubblesContainer: {
-    ...StyleSheet.absoluteFillObject,
-  },
-  bubble: {
+  soundButton: {
     position: 'absolute',
-    borderRadius: 50,
-    backgroundColor: 'rgba(255,255,255,0.3)',
-    borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.5)',
+    top: 10,
+    right: 15,
+    backgroundColor: 'rgba(0,0,0,0.3)',
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex: 10,
+  },
+  soundIcon: {
+    fontSize: 22,
   },
   titleContainer: {
     flexDirection: 'row',
     alignItems: 'center',
     marginBottom: 30,
   },
-  fishEmoji: {
-    fontSize: 50,
+  fishContainer: {
     marginRight: 10,
   },
   titleFlappy: {
@@ -206,7 +212,7 @@ const styles = StyleSheet.create({
     bottom: 0,
     left: 0,
     right: 0,
-    height: 40,
+    height: 45,
     backgroundColor: COLORS.SAND,
   },
 });
