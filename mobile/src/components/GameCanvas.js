@@ -15,7 +15,7 @@ import Coin from './Coin';
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 
-const GameCanvas = ({ onGameOver, onScore, onCoin, onFlap }) => {
+const GameCanvas = ({ onGameOver, onScore, onCoin, onFlap, selectedSkin }) => {
   const { gameState } = useGame();
   const animationRef = useRef(null);
   
