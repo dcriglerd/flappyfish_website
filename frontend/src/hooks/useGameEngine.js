@@ -36,7 +36,7 @@ const useGameEngine = (canvasRef) => {
 
   const resetGame = useCallback(() => {
     gameRef.current = {
-      fish: { x: 120, y: 200, velocity: -1, rotation: 0 }, // Start with slight upward motion
+      fish: { x: 120, y: 280, velocity: 0, rotation: 0 }, // Start in middle
       obstacles: [],
       collectibles: [],
       enemy: null,
