@@ -280,185 +280,203 @@ const GameCanvas = ({
     }
     const offset = parallaxRef.current.offset;
 
-    // Sky gradient (night sky effect)
-    const skyGradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
-    skyGradient.addColorStop(0, '#1a1a4e');
-    skyGradient.addColorStop(0.4, '#2d3a8c');
-    skyGradient.addColorStop(0.7, '#4a6fa5');
-    skyGradient.addColorStop(1, '#6bb3d9');
-    ctx.fillStyle = skyGradient;
+    // Deep ocean gradient
+    const oceanGradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
+    oceanGradient.addColorStop(0, '#0a3d5c');
+    oceanGradient.addColorStop(0.3, '#0d4a6e');
+    oceanGradient.addColorStop(0.6, '#115e7a');
+    oceanGradient.addColorStop(1, '#1a7a8a');
+    ctx.fillStyle = oceanGradient;
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-    // Stars (very slow parallax - almost static)
-    ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
-    for (let i = 0; i < 30; i++) {
-      const starX = ((i * 73 + 50) % canvas.width + offset * 0.02) % canvas.width;
-      const starY = (i * 37 + 20) % (canvas.height * 0.5);
-      const starSize = 1 + (i % 3);
-      ctx.beginPath();
-      ctx.arc(starX, starY, starSize, 0, Math.PI * 2);
-      ctx.fill();
-    }
-
-    // Moon (slowest parallax)
-    const moonX = ((canvas.width * 0.75) - offset * 0.03) % (canvas.width + 150) + 75;
-    ctx.fillStyle = '#e8e8f0';
-    ctx.beginPath();
-    ctx.arc(moonX, 80, 50, 0, Math.PI * 2);
-    ctx.fill();
-    // Moon craters
-    ctx.fillStyle = 'rgba(180, 200, 210, 0.4)';
-    ctx.beginPath();
-    ctx.arc(moonX - 15, 70, 12, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.beginPath();
-    ctx.arc(moonX + 20, 90, 8, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.beginPath();
-    ctx.arc(moonX - 5, 100, 6, 0, Math.PI * 2);
-    ctx.fill();
-
-    // Hot air balloons (very slow parallax)
-    const drawBalloon = (bx, by, size, color) => {
-      ctx.fillStyle = color;
-      ctx.beginPath();
-      ctx.ellipse(bx, by, size, size * 1.2, 0, 0, Math.PI * 2);
-      ctx.fill();
-      // Basket
-      ctx.fillStyle = '#4a3728';
-      ctx.fillRect(bx - size * 0.3, by + size * 1.4, size * 0.6, size * 0.4);
-      // Ropes
-      ctx.strokeStyle = '#4a3728';
-      ctx.lineWidth = 1;
-      ctx.beginPath();
-      ctx.moveTo(bx - size * 0.3, by + size * 1.4);
-      ctx.lineTo(bx - size * 0.5, by + size);
-      ctx.moveTo(bx + size * 0.3, by + size * 1.4);
-      ctx.lineTo(bx + size * 0.5, by + size);
-      ctx.stroke();
-    };
-    drawBalloon((600 - offset * 0.05) % (canvas.width + 200), 150, 25, 'rgba(128, 90, 150, 0.7)');
-    drawBalloon((350 - offset * 0.04) % (canvas.width + 200), 200, 18, 'rgba(150, 100, 140, 0.6)');
-
-    // Far cityscape silhouette (slow parallax)
-    ctx.fillStyle = 'rgba(60, 50, 90, 0.6)';
-    const cityBaseY = canvas.height - 180;
-    for (let i = 0; i < 15; i++) {
-      const buildingX = ((i * 80 - offset * 0.15) % (canvas.width + 200)) - 100;
-      const buildingHeight = 60 + Math.sin(i * 1.5) * 40 + (i % 3) * 20;
-      const buildingWidth = 30 + (i % 4) * 15;
-      ctx.fillRect(buildingX, cityBaseY - buildingHeight, buildingWidth, buildingHeight + 100);
-      // Windows
-      ctx.fillStyle = 'rgba(255, 255, 150, 0.3)';
-      for (let wy = 0; wy < buildingHeight - 10; wy += 15) {
-        for (let wx = 5; wx < buildingWidth - 5; wx += 12) {
-          if (Math.random() > 0.3) {
-            ctx.fillRect(buildingX + wx, cityBaseY - buildingHeight + wy + 5, 6, 8);
-          }
-        }
-      }
-      ctx.fillStyle = 'rgba(60, 50, 90, 0.6)';
-    }
-
-    // Far clouds layer (slow parallax)
-    ctx.fillStyle = 'rgba(120, 180, 220, 0.4)';
+    // Light rays from surface (slow parallax)
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.05)';
     for (let i = 0; i < 6; i++) {
-      const cloudX = ((i * 200 + 100 - offset * 0.2) % (canvas.width + 300)) - 150;
-      const cloudY = 280 + (i % 3) * 40;
-      drawCloud(ctx, cloudX, cloudY, 80 + (i % 2) * 30);
+      const rayX = ((i * 150 + 50 - offset * 0.02) % (canvas.width + 200)) - 100;
+      ctx.beginPath();
+      ctx.moveTo(rayX, 0);
+      ctx.lineTo(rayX - 40, canvas.height);
+      ctx.lineTo(rayX + 80, canvas.height);
+      ctx.closePath();
+      ctx.fill();
     }
 
-    // Mid clouds layer (medium parallax)
-    ctx.fillStyle = 'rgba(150, 210, 240, 0.5)';
+    // Far background coral/rocks (very slow parallax)
+    ctx.fillStyle = 'rgba(30, 60, 90, 0.5)';
+    for (let i = 0; i < 8; i++) {
+      const rockX = ((i * 130 - offset * 0.1) % (canvas.width + 200)) - 100;
+      const rockHeight = 80 + Math.sin(i * 2) * 40;
+      drawRock(ctx, rockX, canvas.height - 60, rockHeight, 50 + (i % 3) * 15);
+    }
+
+    // Mid-ground seaweed (medium parallax)
+    for (let i = 0; i < 12; i++) {
+      const seaweedX = ((i * 80 - offset * 0.3) % (canvas.width + 150)) - 75;
+      drawSeaweed(ctx, seaweedX, canvas.height - 50, 60 + (i % 4) * 20, time, i);
+    }
+
+    // Distant fish swimming (slow parallax)
+    ctx.fillStyle = 'rgba(100, 150, 200, 0.4)';
     for (let i = 0; i < 5; i++) {
-      const cloudX = ((i * 220 + 50 - offset * 0.4) % (canvas.width + 350)) - 175;
-      const cloudY = 320 + (i % 2) * 60;
-      drawCloud(ctx, cloudX, cloudY, 100 + (i % 3) * 20);
+      const fishX = ((i * 200 + offset * 0.15 + 100) % (canvas.width + 300)) - 150;
+      const fishY = 100 + (i % 3) * 80 + Math.sin(time + i) * 20;
+      drawSmallFish(ctx, fishX, fishY, 15 + (i % 2) * 5, 'rgba(100, 150, 200, 0.4)');
     }
 
-    // Near clouds layer (faster parallax)
-    ctx.fillStyle = 'rgba(180, 230, 255, 0.6)';
-    for (let i = 0; i < 4; i++) {
-      const cloudX = ((i * 280 - offset * 0.7) % (canvas.width + 400)) - 200;
-      const cloudY = 380 + (i % 2) * 30;
-      drawCloud(ctx, cloudX, cloudY, 120 + (i % 2) * 30);
-    }
-
-    // Animated bubbles rising
-    ctx.fillStyle = 'rgba(255, 255, 255, 0.25)';
-    for (let i = 0; i < 15; i++) {
-      const bubbleX = ((i * 60 + time * 15) % canvas.width);
-      const bubbleY = canvas.height - ((time * 40 + i * 50) % (canvas.height + 100));
-      const bubbleSize = 2 + Math.sin(i + time) * 2;
+    // Rising bubbles (medium speed)
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.3)';
+    for (let i = 0; i < 25; i++) {
+      const bubbleX = ((i * 45 + offset * 0.1) % canvas.width);
+      const bubbleY = canvas.height - ((time * 50 + i * 35) % (canvas.height + 50));
+      const bubbleSize = 2 + Math.sin(i + time * 2) * 2;
       ctx.beginPath();
       ctx.arc(bubbleX, bubbleY, bubbleSize, 0, Math.PI * 2);
       ctx.fill();
+      // Bubble highlight
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.5)';
+      ctx.beginPath();
+      ctx.arc(bubbleX - bubbleSize * 0.3, bubbleY - bubbleSize * 0.3, bubbleSize * 0.3, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.3)';
     }
 
-    // Ground layer with grass (fastest parallax - matches obstacles)
-    drawGround(ctx, canvas, offset);
+    // Foreground coral reef (fastest parallax)
+    drawCoralReef(ctx, canvas, offset, time);
+
+    // Sandy ocean floor
+    drawOceanFloor(ctx, canvas, offset);
   }, [gameState]);
 
-  // Helper function to draw clouds
-  const drawCloud = (ctx, x, y, size) => {
+  // Helper: Draw underwater rock formation
+  const drawRock = (ctx, x, baseY, height, width) => {
     ctx.beginPath();
-    ctx.arc(x, y, size * 0.5, 0, Math.PI * 2);
-    ctx.arc(x + size * 0.4, y - size * 0.15, size * 0.4, 0, Math.PI * 2);
-    ctx.arc(x + size * 0.8, y, size * 0.45, 0, Math.PI * 2);
-    ctx.arc(x + size * 0.35, y + size * 0.2, size * 0.35, 0, Math.PI * 2);
+    ctx.moveTo(x, baseY);
+    ctx.quadraticCurveTo(x + width * 0.2, baseY - height * 0.7, x + width * 0.5, baseY - height);
+    ctx.quadraticCurveTo(x + width * 0.8, baseY - height * 0.6, x + width, baseY);
+    ctx.closePath();
     ctx.fill();
   };
 
-  // Helper function to draw ground
-  const drawGround = (ctx, canvas, offset) => {
-    const groundY = canvas.height - 50;
+  // Helper: Draw seaweed
+  const drawSeaweed = (ctx, x, baseY, height, time, index) => {
+    const sway = Math.sin(time * 1.5 + index) * 8;
     
-    // Grass layer
-    ctx.fillStyle = '#4CAF50';
+    // Main stalk
+    ctx.strokeStyle = '#1a6b4a';
+    ctx.lineWidth = 6;
+    ctx.lineCap = 'round';
     ctx.beginPath();
-    ctx.moveTo(0, groundY);
-    for (let x = 0; x <= canvas.width; x += 15) {
-      const grassHeight = 8 + Math.sin((x + offset) / 20) * 5;
-      ctx.lineTo(x, groundY - grassHeight);
+    ctx.moveTo(x, baseY);
+    ctx.quadraticCurveTo(x + sway, baseY - height * 0.5, x + sway * 1.5, baseY - height);
+    ctx.stroke();
+
+    // Side fronds
+    ctx.strokeStyle = '#2d8a5e';
+    ctx.lineWidth = 4;
+    for (let j = 0; j < 3; j++) {
+      const frondY = baseY - height * (0.3 + j * 0.25);
+      const frondSway = sway * (0.5 + j * 0.2);
+      ctx.beginPath();
+      ctx.moveTo(x + frondSway * 0.5, frondY);
+      ctx.quadraticCurveTo(x + frondSway + 15, frondY - 15, x + frondSway + 25, frondY - 10);
+      ctx.stroke();
     }
-    ctx.lineTo(canvas.width, groundY);
+  };
+
+  // Helper: Draw small background fish
+  const drawSmallFish = (ctx, x, y, size, color) => {
+    ctx.fillStyle = color;
+    ctx.beginPath();
+    ctx.ellipse(x, y, size, size * 0.6, 0, 0, Math.PI * 2);
+    ctx.fill();
+    // Tail
+    ctx.beginPath();
+    ctx.moveTo(x - size, y);
+    ctx.lineTo(x - size * 1.5, y - size * 0.5);
+    ctx.lineTo(x - size * 1.5, y + size * 0.5);
+    ctx.closePath();
+    ctx.fill();
+  };
+
+  // Helper: Draw coral reef at bottom
+  const drawCoralReef = (ctx, canvas, offset, time) => {
+    const colors = ['#ff6b6b', '#ffa07a', '#ff69b4', '#dda0dd', '#ff7f50'];
+    
+    for (let i = 0; i < 10; i++) {
+      const coralX = ((i * 100 - offset * 0.5) % (canvas.width + 150)) - 75;
+      const color = colors[i % colors.length];
+      
+      // Branch coral
+      if (i % 2 === 0) {
+        ctx.strokeStyle = color;
+        ctx.lineWidth = 5;
+        ctx.lineCap = 'round';
+        const baseY = canvas.height - 45;
+        for (let b = 0; b < 4; b++) {
+          const angle = -60 + b * 40;
+          const len = 25 + (b % 2) * 15;
+          ctx.beginPath();
+          ctx.moveTo(coralX, baseY);
+          ctx.lineTo(
+            coralX + Math.cos(angle * Math.PI / 180) * len,
+            baseY + Math.sin(angle * Math.PI / 180) * len
+          );
+          ctx.stroke();
+        }
+      } else {
+        // Round coral
+        ctx.fillStyle = color;
+        for (let c = 0; c < 5; c++) {
+          ctx.beginPath();
+          ctx.arc(
+            coralX + c * 8 - 16,
+            canvas.height - 50 - c * 3 + Math.abs(c - 2) * 5,
+            8 + Math.sin(c) * 3,
+            0, Math.PI * 2
+          );
+          ctx.fill();
+        }
+      }
+    }
+  };
+
+  // Helper: Draw ocean floor
+  const drawOceanFloor = (ctx, canvas, offset) => {
+    // Sandy gradient
+    const sandGradient = ctx.createLinearGradient(0, canvas.height - 40, 0, canvas.height);
+    sandGradient.addColorStop(0, '#c4a35a');
+    sandGradient.addColorStop(0.5, '#b8956f');
+    sandGradient.addColorStop(1, '#9c7e5a');
+    
+    ctx.fillStyle = sandGradient;
+    ctx.beginPath();
+    ctx.moveTo(0, canvas.height - 35);
+    // Wavy sand
+    for (let x = 0; x <= canvas.width; x += 20) {
+      const waveY = canvas.height - 35 + Math.sin((x + offset) / 30) * 5;
+      ctx.lineTo(x, waveY);
+    }
     ctx.lineTo(canvas.width, canvas.height);
     ctx.lineTo(0, canvas.height);
     ctx.closePath();
     ctx.fill();
 
-    // Stone/brick base layer
-    ctx.fillStyle = '#37474F';
-    ctx.fillRect(0, groundY + 5, canvas.width, canvas.height - groundY);
-
-    // Brick pattern
-    ctx.fillStyle = '#455A64';
-    const brickWidth = 40;
-    const brickHeight = 15;
-    for (let row = 0; row < 3; row++) {
-      const rowOffset = row % 2 === 0 ? 0 : brickWidth / 2;
-      for (let col = -1; col < canvas.width / brickWidth + 2; col++) {
-        const brickX = ((col * brickWidth + rowOffset - offset * 0.5) % (canvas.width + brickWidth * 2)) - brickWidth;
-        ctx.strokeStyle = '#263238';
-        ctx.lineWidth = 2;
-        ctx.strokeRect(brickX, groundY + 8 + row * brickHeight, brickWidth - 2, brickHeight - 2);
-      }
+    // Sand ripples
+    ctx.strokeStyle = 'rgba(150, 120, 80, 0.3)';
+    ctx.lineWidth = 2;
+    for (let i = 0; i < 8; i++) {
+      const rippleX = ((i * 120 - offset * 0.8) % (canvas.width + 100)) - 50;
+      ctx.beginPath();
+      ctx.arc(rippleX, canvas.height - 20, 30 + i * 5, 0.2 * Math.PI, 0.8 * Math.PI);
+      ctx.stroke();
     }
 
-    // Grass tufts on top
-    ctx.fillStyle = '#66BB6A';
-    for (let i = 0; i < 30; i++) {
-      const tuftX = ((i * 35 - offset) % (canvas.width + 100)) - 50;
-      const tuftY = groundY - 5;
+    // Small shells/pebbles
+    ctx.fillStyle = 'rgba(180, 160, 140, 0.6)';
+    for (let i = 0; i < 15; i++) {
+      const pebbleX = ((i * 60 - offset * 0.6) % (canvas.width + 50)) - 25;
       ctx.beginPath();
-      ctx.moveTo(tuftX, tuftY);
-      ctx.lineTo(tuftX - 3, tuftY - 12 - Math.sin(i) * 4);
-      ctx.lineTo(tuftX + 3, tuftY);
-      ctx.fill();
-      ctx.beginPath();
-      ctx.moveTo(tuftX + 5, tuftY);
-      ctx.lineTo(tuftX + 8, tuftY - 10 - Math.cos(i) * 3);
-      ctx.lineTo(tuftX + 11, tuftY);
+      ctx.ellipse(pebbleX, canvas.height - 15 + (i % 3) * 5, 4 + (i % 3) * 2, 3, 0, 0, Math.PI * 2);
       ctx.fill();
     }
   };
