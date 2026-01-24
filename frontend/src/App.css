@@ -32,3 +32,48 @@
         transform: rotate(360deg);
     }
 }
+
+/* Game specific styles */
+html, body, #root, .App {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    width: 100%;
+    overflow: hidden;
+}
+
+.App {
+    background: linear-gradient(to bottom, #0c4a6e, #1e3a5f);
+}
+
+/* Ensure canvas is responsive */
+canvas {
+    display: block;
+    max-width: 100%;
+    height: auto;
+}
+
+/* Smooth scrolling and touch behavior */
+* {
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+}
+
+/* Custom scrollbar for modals */
+::-webkit-scrollbar {
+    width: 6px;
+}
+
+::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.5);
+}
