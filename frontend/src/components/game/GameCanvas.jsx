@@ -546,7 +546,7 @@ const GameCanvas = ({
           }
         }
 
-        game.lastObstacleTime = timestamp;
+        game.lastObstacleTime = currentTime;
       }
 
       // Update obstacles
@@ -554,7 +554,7 @@ const GameCanvas = ({
         obs.x -= GAME_CONFIG.obstacleSpeed * speedMultiplier;
 
         // Score check
-        if (!obs.scored && obs.x + 60 < game.fish.x) {
+        if (!obs.scored && obs.x + 70 < game.fish.x) {
           obs.scored = true;
           onScoreUpdate(prev => prev + 1);
         }
