@@ -96,7 +96,14 @@ Located in `/app/mobile/src/constants/config.js`:
 - [ ] Add Shop modal (coin purchases)
 - [ ] Add Skins modal (fish customization)
 - [ ] Implement power-ups
-- [ ] Add sound effects (expo-av)
+
+## Recently Completed
+- [x] Sound effects system (expo-av) - Dec 2025
+  - Flap/swim bubble sound
+  - Coin collection sparkle
+  - Score arpeggio
+  - Game over descending tone
+  - Mute toggle on StartScreen and GameUI
 
 ## P2 - Future Tasks
 - [ ] Real Google AdMob integration (requires dev build)
