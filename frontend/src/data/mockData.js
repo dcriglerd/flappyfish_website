@@ -1,11 +1,11 @@
 // Mock data for Flappy Fish game
 
 export const GAME_CONFIG = {
-  gravity: 0.4,
-  flapForce: -7,
+  gravity: 0.35,
+  flapForce: -7.5,
   obstacleSpeed: 2.5,
-  obstacleInterval: 2200, // ms
-  gapHeight: 170,
+  obstacleInterval: 2000, // ms
+  gapHeight: 175,
   fishSize: 40,
   chaseChance: 0.12, // 12% chance per obstacle
   chaseDuration: 8000, // ms
