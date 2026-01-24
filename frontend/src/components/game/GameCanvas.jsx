@@ -422,22 +422,22 @@ const GameCanvas = ({
     ctx.fill();
   };
 
-  // Helper: Draw seaweed
+  // Helper: Draw seaweed (brighter green)
   const drawSeaweed = (ctx, x, baseY, height, time, index) => {
-    const sway = Math.sin(time * 1.5 + index) * 8;
+    const sway = Math.sin(time * 1.5 + index) * 10;
     
-    // Main stalk
-    ctx.strokeStyle = '#1a6b4a';
-    ctx.lineWidth = 6;
+    // Main stalk - bright green
+    ctx.strokeStyle = '#22c55e';
+    ctx.lineWidth = 7;
     ctx.lineCap = 'round';
     ctx.beginPath();
     ctx.moveTo(x, baseY);
     ctx.quadraticCurveTo(x + sway, baseY - height * 0.5, x + sway * 1.5, baseY - height);
     ctx.stroke();
 
-    // Side fronds
-    ctx.strokeStyle = '#2d8a5e';
-    ctx.lineWidth = 4;
+    // Side fronds - even brighter
+    ctx.strokeStyle = '#4ade80';
+    ctx.lineWidth = 5;
     for (let j = 0; j < 3; j++) {
       const frondY = baseY - height * (0.3 + j * 0.25);
       const frondSway = sway * (0.5 + j * 0.2);
