@@ -7,7 +7,7 @@ import {
 } from 'react-native';
 import * as Haptics from 'expo-haptics';
 import { useGame } from '../context/GameContext';
-import { GAME_CONFIG, COLORS } from '../constants/config';
+import { GAME_CONFIG } from '../constants/config';
 
 import Fish from './Fish';
 import Obstacle from './Obstacle';
@@ -15,15 +15,15 @@ import Coin from './Coin';
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 
-const GameCanvas = ({ onGameOver, onScore, onCoin }) => {
-  const { gameState, gameRef } = useGame();
+const GameCanvas = ({ onGameOver, onScore, onCoin, onFlap }) => {
+  const { gameState } = useGame();
   const animationRef = useRef(null);
-  const lastTimeRef = useRef(Date.now());
   
   const [fish, setFish] = useState({ x: 80, y: SCREEN_HEIGHT / 3, velocity: 0, rotation: 0 });
   const [obstacles, setObstacles] = useState([]);
   const [coins, setCoins] = useState([]);
   const lastSpawnRef = useRef(0);
+  const gameOverCalledRef = useRef(false);
 
   // Reset game state when starting
   useEffect(() => {
@@ -32,7 +32,7 @@ const GameCanvas = ({ onGameOver, onScore, onCoin }) => {
       setObstacles([]);
       setCoins([]);
       lastSpawnRef.current = Date.now();
-      lastTimeRef.current = Date.now();
+      gameOverCalledRef.current = false;
     }
   }, [gameState]);
 
@@ -46,6 +46,8 @@ const GameCanvas = ({ onGameOver, onScore, onCoin }) => {
     }
 
     const gameLoop = () => {
+      if (gameOverCalledRef.current) return;
+      
       const now = Date.now();
       
       setFish(prevFish => {
@@ -54,8 +56,9 @@ const GameCanvas = ({ onGameOver, onScore, onCoin }) => {
         const newRotation = Math.min(90, Math.max(-30, newVelocity * 5));
 
         // Check boundaries
-        if (newY < 20 || newY > SCREEN_HEIGHT - 80) {
-          onGameOver && onGameOver();
+        if ((newY < 20 || newY > SCREEN_HEIGHT - 80) && !gameOverCalledRef.current) {
+          gameOverCalledRef.current = true;
+          setTimeout(() => onGameOver && onGameOver(), 0);
           return prevFish;
         }
 
@@ -91,12 +94,12 @@ const GameCanvas = ({ onGameOver, onScore, onCoin }) => {
         lastSpawnRef.current = now;
       }
 
-      // Move obstacles and check collisions
+      // Move obstacles
       setObstacles(prev => {
-        return prev.map(obs => {
-          const newX = obs.x - GAME_CONFIG.OBSTACLE_SPEED;
-          return { ...obs, x: newX };
-        }).filter(obs => obs.x > -100);
+        return prev.map(obs => ({
+          ...obs,
+          x: obs.x - GAME_CONFIG.OBSTACLE_SPEED,
+        })).filter(obs => obs.x > -100);
       });
 
       // Move coins
@@ -121,7 +124,7 @@ const GameCanvas = ({ onGameOver, onScore, onCoin }) => {
 
   // Collision detection in separate effect
   useEffect(() => {
-    if (gameState !== 'playing') return;
+    if (gameState !== 'playing' || gameOverCalledRef.current) return;
 
     const fishLeft = fish.x - 20;
     const fishRight = fish.x + 20;
@@ -137,7 +140,10 @@ const GameCanvas = ({ onGameOver, onScore, onCoin }) => {
 
       if (fishRight > obsLeft && fishLeft < obsRight) {
         if (fishTop < gapTop || fishBottom > gapBottom) {
-          onGameOver && onGameOver();
+          if (!gameOverCalledRef.current) {
+            gameOverCalledRef.current = true;
+            onGameOver && onGameOver();
+          }
           return;
         }
       }
@@ -145,7 +151,6 @@ const GameCanvas = ({ onGameOver, onScore, onCoin }) => {
       // Score when passing obstacle
       if (!obs.scored && obs.x + 70 < fish.x) {
         obs.scored = true;
-        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
         onScore && onScore();
       }
     }
@@ -158,7 +163,6 @@ const GameCanvas = ({ onGameOver, onScore, onCoin }) => {
         const distance = Math.sqrt(dx * dx + dy * dy);
         
         if (distance < 35) {
-          Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
           onCoin && onCoin();
           return false;
         }
@@ -169,14 +173,15 @@ const GameCanvas = ({ onGameOver, onScore, onCoin }) => {
 
   // Handle tap to flap
   const handleTap = useCallback(() => {
-    if (gameState === 'playing') {
+    if (gameState === 'playing' && !gameOverCalledRef.current) {
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+      onFlap && onFlap(); // Play flap sound
       setFish(prev => ({
         ...prev,
         velocity: GAME_CONFIG.FLAP_FORCE,
       }));
     }
-  }, [gameState]);
+  }, [gameState, onFlap]);
 
   if (gameState !== 'playing') {
     return null;
