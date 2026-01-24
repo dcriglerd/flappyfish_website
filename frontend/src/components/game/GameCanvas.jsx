@@ -604,12 +604,12 @@ const GameCanvas = ({
       game.fish.y += game.fish.velocity;
       game.fish.rotation = Math.min(90, Math.max(-30, game.fish.velocity * 3));
 
-      // Boundary check - ceiling and ocean floor
-      if (game.fish.y < 5 || game.fish.y > canvas.height - 55) {
+      // Boundary check - ceiling and ocean floor (adjusted for 900 height)
+      if (game.fish.y < 5 || game.fish.y > canvas.height - 70) {
         if (activePowerUp !== 'bubble_shield') {
           onGameOver();
         } else {
-          game.fish.y = Math.max(10, Math.min(canvas.height - 60, game.fish.y));
+          game.fish.y = Math.max(10, Math.min(canvas.height - 75, game.fish.y));
           game.fish.velocity = 0;
         }
       }
