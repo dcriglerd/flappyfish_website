@@ -72,34 +72,36 @@ const SkinsModal = ({ isOpen, onClose, coins, selectedSkin, onSelectSkin, onUnlo
                   {/* Fish Preview */}
                   <div className="w-20 h-20 mx-auto mb-3 relative">
                     <svg viewBox="0 0 100 80" className="w-full h-full">
+                      <defs>
+                        <linearGradient id={`rainbow-${skin.id}`} x1="0%" y1="0%" x2="100%" y2="100%">
+                          <stop offset="0%" stopColor="#ff0000" />
+                          <stop offset="20%" stopColor="#ffff00" />
+                          <stop offset="40%" stopColor="#00ff00" />
+                          <stop offset="60%" stopColor="#00ffff" />
+                          <stop offset="80%" stopColor="#0000ff" />
+                          <stop offset="100%" stopColor="#ff00ff" />
+                        </linearGradient>
+                      </defs>
                       <ellipse
                         cx="50"
                         cy="40"
                         rx="35"
                         ry="25"
-                        fill={skin.color === 'rainbow' ? 'url(#rainbow)' : skin.color}
+                        fill={skin.color === 'rainbow' ? `url(#rainbow-${skin.id})` : skin.color}
+                        opacity={isUnlocked ? 1 : 0.5}
                       />
                       <polygon
                         points="15,40 -5,20 -5,60"
-                        fill={skin.color === 'rainbow' ? 'url(#rainbow)' : skin.color}
+                        fill={skin.color === 'rainbow' ? `url(#rainbow-${skin.id})` : skin.color}
+                        opacity={isUnlocked ? 1 : 0.5}
                       />
+                      <polygon points="50,15 60,0 40,15" fill={skin.color === 'rainbow' ? `url(#rainbow-${skin.id})` : skin.color} opacity={isUnlocked ? 0.8 : 0.4} />
                       <circle cx="65" cy="35" r="8" fill="white" />
                       <circle cx="67" cy="35" r="4" fill="black" />
-                      {skin.color === 'rainbow' && (
-                        <defs>
-                          <linearGradient id="rainbow" x1="0%" y1="0%" x2="100%" y2="100%">
-                            <stop offset="0%" stopColor="#ff0000" />
-                            <stop offset="25%" stopColor="#ffff00" />
-                            <stop offset="50%" stopColor="#00ff00" />
-                            <stop offset="75%" stopColor="#0000ff" />
-                            <stop offset="100%" stopColor="#ff00ff" />
-                          </linearGradient>
-                        </defs>
-                      )}
                     </svg>
                     {!isUnlocked && (
-                      <div className="absolute inset-0 bg-black/60 rounded-lg flex items-center justify-center">
-                        <Lock className="w-8 h-8 text-white/60" />
+                      <div className="absolute bottom-0 left-1/2 -translate-x-1/2 bg-black/70 rounded-full p-1">
+                        <Lock className="w-4 h-4 text-white/80" />
                       </div>
                     )}
                     {isSelected && isUnlocked && (
