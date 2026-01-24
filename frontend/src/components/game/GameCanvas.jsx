@@ -519,28 +519,31 @@ const GameCanvas = ({
         }
       }
 
-      // Spawn obstacles
-      if (timestamp - game.lastObstacleTime > GAME_CONFIG.obstacleInterval) {
-        // Ensure gap is in playable area (not too close to ground)
-        const gapY = 120 + Math.random() * (canvas.height - 300);
-        game.obstacles.push({
-          x: canvas.width,
-          gapY,
-          scored: false,
-        });
-
-        // Spawn coin in gap
-        if (Math.random() < 0.7) {
-          game.collectibles.push({
-            x: canvas.width + 30,
-            y: gapY,
-            type: 'coin',
+      // Spawn obstacles using performance.now() based timing
+      const currentTime = performance.now();
+      if (!game.lastObstacleTime || currentTime - game.lastObstacleTime > GAME_CONFIG.obstacleInterval) {
+        if (game.lastObstacleTime) { // Skip first spawn to give player breathing room
+          // Ensure gap is in playable area (not too close to ground)
+          const gapY = 130 + Math.random() * (canvas.height - 320);
+          game.obstacles.push({
+            x: canvas.width,
+            gapY,
+            scored: false,
           });
-        }
 
-        // Random chase trigger
-        if (Math.random() < GAME_CONFIG.chaseChance) {
-          onTriggerChase();
+          // Spawn coin in gap
+          if (Math.random() < 0.7) {
+            game.collectibles.push({
+              x: canvas.width + 30,
+              y: gapY,
+              type: 'coin',
+            });
+          }
+
+          // Random chase trigger
+          if (Math.random() < GAME_CONFIG.chaseChance) {
+            onTriggerChase();
+          }
         }
 
         game.lastObstacleTime = timestamp;
