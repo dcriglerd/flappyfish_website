@@ -518,18 +518,18 @@ const GameCanvas = ({
 
   // Helper: Draw ocean floor
   const drawOceanFloor = (ctx, canvas, offset) => {
-    // Sandy gradient
+    // Bright sandy gradient
     const sandGradient = ctx.createLinearGradient(0, canvas.height - 40, 0, canvas.height);
-    sandGradient.addColorStop(0, '#c4a35a');
-    sandGradient.addColorStop(0.5, '#b8956f');
-    sandGradient.addColorStop(1, '#9c7e5a');
+    sandGradient.addColorStop(0, '#f4d03f');
+    sandGradient.addColorStop(0.5, '#daa520');
+    sandGradient.addColorStop(1, '#b8860b');
     
     ctx.fillStyle = sandGradient;
     ctx.beginPath();
     ctx.moveTo(0, canvas.height - 35);
     // Wavy sand
     for (let x = 0; x <= canvas.width; x += 20) {
-      const waveY = canvas.height - 35 + Math.sin((x + offset) / 30) * 5;
+      const waveY = canvas.height - 35 + Math.sin((x + offset) / 30) * 4;
       ctx.lineTo(x, waveY);
     }
     ctx.lineTo(canvas.width, canvas.height);
@@ -538,21 +538,22 @@ const GameCanvas = ({
     ctx.fill();
 
     // Sand ripples
-    ctx.strokeStyle = 'rgba(150, 120, 80, 0.3)';
+    ctx.strokeStyle = 'rgba(184, 134, 11, 0.4)';
     ctx.lineWidth = 2;
-    for (let i = 0; i < 8; i++) {
-      const rippleX = ((i * 120 - offset * 0.8) % (canvas.width + 100)) - 50;
+    for (let i = 0; i < 10; i++) {
+      const rippleX = ((i * 100 - offset * 0.8) % (canvas.width + 100)) - 50;
       ctx.beginPath();
-      ctx.arc(rippleX, canvas.height - 20, 30 + i * 5, 0.2 * Math.PI, 0.8 * Math.PI);
+      ctx.arc(rippleX, canvas.height - 18, 25 + i * 4, 0.2 * Math.PI, 0.8 * Math.PI);
       ctx.stroke();
     }
 
-    // Small shells/pebbles
-    ctx.fillStyle = 'rgba(180, 160, 140, 0.6)';
-    for (let i = 0; i < 15; i++) {
-      const pebbleX = ((i * 60 - offset * 0.6) % (canvas.width + 50)) - 25;
+    // Shells and starfish
+    const shellColors = ['#fff5e6', '#ffe4c4', '#ffdab9'];
+    for (let i = 0; i < 12; i++) {
+      const shellX = ((i * 75 - offset * 0.6) % (canvas.width + 50)) - 25;
+      ctx.fillStyle = shellColors[i % shellColors.length];
       ctx.beginPath();
-      ctx.ellipse(pebbleX, canvas.height - 15 + (i % 3) * 5, 4 + (i % 3) * 2, 3, 0, 0, Math.PI * 2);
+      ctx.ellipse(shellX, canvas.height - 12 + (i % 3) * 4, 5 + (i % 3) * 2, 4, 0, 0, Math.PI * 2);
       ctx.fill();
     }
   };
