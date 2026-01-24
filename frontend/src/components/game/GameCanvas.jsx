@@ -338,46 +338,48 @@ const GameCanvas = ({
     }
     const offset = parallaxRef.current.offset;
 
-    // Deep ocean gradient
+    // BRIGHT ocean gradient
     const oceanGradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
-    oceanGradient.addColorStop(0, '#0a3d5c');
-    oceanGradient.addColorStop(0.3, '#0d4a6e');
-    oceanGradient.addColorStop(0.6, '#115e7a');
-    oceanGradient.addColorStop(1, '#1a7a8a');
+    oceanGradient.addColorStop(0, '#00d4ff');
+    oceanGradient.addColorStop(0.25, '#00b4d8');
+    oceanGradient.addColorStop(0.5, '#0096c7');
+    oceanGradient.addColorStop(0.75, '#0077b6');
+    oceanGradient.addColorStop(1, '#005f8a');
     ctx.fillStyle = oceanGradient;
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-    // Light rays from surface (slow parallax)
-    ctx.fillStyle = 'rgba(255, 255, 255, 0.05)';
-    for (let i = 0; i < 6; i++) {
-      const rayX = ((i * 150 + 50 - offset * 0.02) % (canvas.width + 200)) - 100;
+    // Brighter light rays from surface
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.12)';
+    for (let i = 0; i < 8; i++) {
+      const rayX = ((i * 120 + 30 - offset * 0.02) % (canvas.width + 200)) - 100;
       ctx.beginPath();
       ctx.moveTo(rayX, 0);
-      ctx.lineTo(rayX - 40, canvas.height);
-      ctx.lineTo(rayX + 80, canvas.height);
+      ctx.lineTo(rayX - 30, canvas.height);
+      ctx.lineTo(rayX + 70, canvas.height);
       ctx.closePath();
       ctx.fill();
     }
 
-    // Far background coral/rocks (very slow parallax)
-    ctx.fillStyle = 'rgba(30, 60, 90, 0.5)';
+    // Far background coral/rocks
+    ctx.fillStyle = 'rgba(0, 80, 120, 0.4)';
     for (let i = 0; i < 8; i++) {
       const rockX = ((i * 130 - offset * 0.1) % (canvas.width + 200)) - 100;
       const rockHeight = 80 + Math.sin(i * 2) * 40;
-      drawRock(ctx, rockX, canvas.height - 60, rockHeight, 50 + (i % 3) * 15);
+      drawRock(ctx, rockX, canvas.height - 55, rockHeight, 50 + (i % 3) * 15);
     }
 
-    // Mid-ground seaweed (medium parallax)
+    // Mid-ground seaweed
     for (let i = 0; i < 12; i++) {
       const seaweedX = ((i * 80 - offset * 0.3) % (canvas.width + 150)) - 75;
-      drawSeaweed(ctx, seaweedX, canvas.height - 50, 60 + (i % 4) * 20, time, i);
+      drawSeaweed(ctx, seaweedX, canvas.height - 45, 60 + (i % 4) * 20, time, i);
     }
 
-    // Distant fish swimming (slow parallax)
-    ctx.fillStyle = 'rgba(100, 150, 200, 0.4)';
-    for (let i = 0; i < 5; i++) {
-      const fishX = ((i * 200 + offset * 0.15 + 100) % (canvas.width + 300)) - 150;
-      const fishY = 100 + (i % 3) * 80 + Math.sin(time + i) * 20;
+    // Distant fish swimming
+    for (let i = 0; i < 6; i++) {
+      const fishX = ((i * 180 + offset * 0.15 + 100) % (canvas.width + 300)) - 150;
+      const fishY = 80 + (i % 3) * 70 + Math.sin(time + i) * 15;
+      drawSmallFish(ctx, fishX, fishY, 12 + (i % 2) * 5, 'rgba(100, 180, 220, 0.5)');
+    }
       drawSmallFish(ctx, fishX, fishY, 15 + (i % 2) * 5, 'rgba(100, 150, 200, 0.4)');
     }
 
