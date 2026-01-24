@@ -93,7 +93,7 @@ Located in `/app/mobile/src/constants/config.js`:
 - [x] Basic UI (start, game over, HUD)
 
 ## P1 - Upcoming Tasks
-- [ ] Integrate real IAP (RevenueCat/Stripe)
+- [ ] Configure RevenueCat products in dashboard
 - [ ] Backend for cloud sync
 
 ## Recently Completed
