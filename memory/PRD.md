@@ -120,6 +120,19 @@ Located in `/app/mobile/src/constants/config.js`:
   - Select/equip skins
   - SVG fish preview with color
 
+- [x] Power-Up System - Dec 2025
+  - Bubble Shield: Protects from one hit (shows bubble around fish)
+  - Slow Motion: Slows obstacles to 50% speed (blue overlay)
+  - Coin Magnet: Attracts coins within radius (purple glow on coins)
+  - Double Coins: 2x coin multiplier (x2 badge in UI)
+  - PowerUpBar component during gameplay
+  - Active power-up indicators in GameUI
+
+- [x] App Open Ads - Dec 2025
+  - Shows on app launch after 2 second delay
+  - Shows when app returns from background (30s cooldown)
+  - Uses production App Open ad unit ID
+
 ## P2 - Future Tasks
 - [ ] Real payment processor (Stripe/RevenueCat)
 - [ ] Backend for user data persistence
