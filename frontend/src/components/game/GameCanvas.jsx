@@ -463,23 +463,23 @@ const GameCanvas = ({
     ctx.fill();
   };
 
-  // Helper: Draw coral reef at bottom
+  // Helper: Draw coral reef at bottom (brighter colors)
   const drawCoralReef = (ctx, canvas, offset, time) => {
-    const colors = ['#ff6b6b', '#ffa07a', '#ff69b4', '#dda0dd', '#ff7f50'];
+    const colors = ['#ff4757', '#ff6b81', '#ff9ff3', '#feca57', '#ff6348', '#5f27cd', '#00d2d3'];
     
-    for (let i = 0; i < 10; i++) {
-      const coralX = ((i * 100 - offset * 0.5) % (canvas.width + 150)) - 75;
+    for (let i = 0; i < 12; i++) {
+      const coralX = ((i * 85 - offset * 0.5) % (canvas.width + 150)) - 75;
       const color = colors[i % colors.length];
       
       // Branch coral
       if (i % 2 === 0) {
         ctx.strokeStyle = color;
-        ctx.lineWidth = 5;
+        ctx.lineWidth = 6;
         ctx.lineCap = 'round';
-        const baseY = canvas.height - 45;
-        for (let b = 0; b < 4; b++) {
-          const angle = -60 + b * 40;
-          const len = 25 + (b % 2) * 15;
+        const baseY = canvas.height - 40;
+        for (let b = 0; b < 5; b++) {
+          const angle = -70 + b * 35;
+          const len = 20 + (b % 2) * 18;
           ctx.beginPath();
           ctx.moveTo(coralX, baseY);
           ctx.lineTo(
@@ -489,17 +489,28 @@ const GameCanvas = ({
           ctx.stroke();
         }
       } else {
-        // Round coral
+        // Round coral - bubble style
         ctx.fillStyle = color;
-        for (let c = 0; c < 5; c++) {
+        for (let c = 0; c < 6; c++) {
           ctx.beginPath();
           ctx.arc(
-            coralX + c * 8 - 16,
-            canvas.height - 50 - c * 3 + Math.abs(c - 2) * 5,
-            8 + Math.sin(c) * 3,
+            coralX + c * 9 - 20,
+            canvas.height - 45 - c * 4 + Math.abs(c - 2.5) * 6,
+            9 + Math.sin(c) * 4,
             0, Math.PI * 2
           );
           ctx.fill();
+          // Highlight
+          ctx.fillStyle = 'rgba(255,255,255,0.3)';
+          ctx.beginPath();
+          ctx.arc(
+            coralX + c * 9 - 22,
+            canvas.height - 48 - c * 4 + Math.abs(c - 2.5) * 6,
+            3,
+            0, Math.PI * 2
+          );
+          ctx.fill();
+          ctx.fillStyle = color;
         }
       }
     }
