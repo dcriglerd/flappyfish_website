@@ -470,7 +470,7 @@ const GameCanvas = ({
     const fishBottom = fish.y + 15;
 
     const obsLeft = obstacle.x;
-    const obsRight = obstacle.x + 60;
+    const obsRight = obstacle.x + 70; // Updated for wider pipe
     const gapTop = obstacle.gapY - GAME_CONFIG.gapHeight / 2;
     const gapBottom = obstacle.gapY + GAME_CONFIG.gapHeight / 2;
 
@@ -481,6 +481,13 @@ const GameCanvas = ({
     }
     return false;
   }, []);
+
+  // Reset parallax when game state changes to menu
+  useEffect(() => {
+    if (gameState === 'menu') {
+      parallaxRef.current.offset = 0;
+    }
+  }, [gameState]);
 
   const gameLoop = useCallback((timestamp) => {
     const canvas = canvasRef.current;
