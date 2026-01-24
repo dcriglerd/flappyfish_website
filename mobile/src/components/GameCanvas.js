@@ -1,174 +1,180 @@
-import React, { useEffect, useRef, useCallback } from 'react';
+import React, { useEffect, useRef, useCallback, useState } from 'react';
 import {
   View,
   StyleSheet,
   Dimensions,
   TouchableWithoutFeedback,
-  Animated,
 } from 'react-native';
-import { GameEngine } from 'react-native-game-engine';
+import * as Haptics from 'expo-haptics';
 import { useGame } from '../context/GameContext';
-import { useAds } from '../context/AdsContext';
 import { GAME_CONFIG, COLORS } from '../constants/config';
 
 import Fish from './Fish';
 import Obstacle from './Obstacle';
-import Background from './Background';
 import Coin from './Coin';
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 
-// Game Systems
-const Physics = (entities, { time, dispatch }) => {
-  const fish = entities.fish;
+const GameCanvas = ({ onGameOver, onScore, onCoin }) => {
+  const { gameState, gameRef } = useGame();
+  const animationRef = useRef(null);
+  const lastTimeRef = useRef(Date.now());
   
-  if (!fish) return entities;
+  const [fish, setFish] = useState({ x: 80, y: SCREEN_HEIGHT / 3, velocity: 0, rotation: 0 });
+  const [obstacles, setObstacles] = useState([]);
+  const [coins, setCoins] = useState([]);
+  const lastSpawnRef = useRef(0);
 
-  // Apply gravity
-  fish.velocity += GAME_CONFIG.GRAVITY;
-  fish.position.y += fish.velocity;
-  fish.rotation = Math.min(90, Math.max(-30, fish.velocity * 5));
+  // Reset game state when starting
+  useEffect(() => {
+    if (gameState === 'playing') {
+      setFish({ x: 80, y: SCREEN_HEIGHT / 3, velocity: 0, rotation: 0 });
+      setObstacles([]);
+      setCoins([]);
+      lastSpawnRef.current = Date.now();
+      lastTimeRef.current = Date.now();
+    }
+  }, [gameState]);
 
-  // Check boundaries
-  if (fish.position.y < 0 || fish.position.y > SCREEN_HEIGHT - 100) {
-    dispatch({ type: 'game-over' });
-  }
+  // Main game loop
+  useEffect(() => {
+    if (gameState !== 'playing') {
+      if (animationRef.current) {
+        cancelAnimationFrame(animationRef.current);
+      }
+      return;
+    }
 
-  return entities;
-};
+    const gameLoop = () => {
+      const now = Date.now();
+      
+      setFish(prevFish => {
+        const newVelocity = prevFish.velocity + GAME_CONFIG.GRAVITY;
+        const newY = prevFish.y + newVelocity;
+        const newRotation = Math.min(90, Math.max(-30, newVelocity * 5));
 
-const ObstacleSpawner = (entities, { time, dispatch }) => {
-  const now = Date.now();
-  
-  if (!entities.spawner) {
-    entities.spawner = { lastSpawn: now };
-  }
+        // Check boundaries
+        if (newY < 20 || newY > SCREEN_HEIGHT - 80) {
+          onGameOver && onGameOver();
+          return prevFish;
+        }
 
-  if (now - entities.spawner.lastSpawn > GAME_CONFIG.OBSTACLE_INTERVAL) {
-    const gapY = 100 + Math.random() * (SCREEN_HEIGHT - 350);
-    const obstacleId = `obstacle_${now}`;
-    
-    entities[obstacleId] = {
-      position: { x: SCREEN_WIDTH, gapY },
-      type: 'obstacle',
-      scored: false,
-      renderer: Obstacle,
+        return {
+          ...prevFish,
+          y: newY,
+          velocity: newVelocity,
+          rotation: newRotation,
+        };
+      });
+
+      // Spawn obstacles
+      if (now - lastSpawnRef.current > GAME_CONFIG.OBSTACLE_INTERVAL) {
+        const gapY = 120 + Math.random() * (SCREEN_HEIGHT - 340);
+        const newObstacle = {
+          id: `obs_${now}`,
+          x: SCREEN_WIDTH,
+          gapY,
+          scored: false,
+        };
+        
+        setObstacles(prev => [...prev, newObstacle]);
+        
+        // Spawn coin in gap (70% chance)
+        if (Math.random() < 0.7) {
+          setCoins(prev => [...prev, {
+            id: `coin_${now}`,
+            x: SCREEN_WIDTH + 35,
+            y: gapY,
+          }]);
+        }
+        
+        lastSpawnRef.current = now;
+      }
+
+      // Move obstacles and check collisions
+      setObstacles(prev => {
+        return prev.map(obs => {
+          const newX = obs.x - GAME_CONFIG.OBSTACLE_SPEED;
+          return { ...obs, x: newX };
+        }).filter(obs => obs.x > -100);
+      });
+
+      // Move coins
+      setCoins(prev => {
+        return prev.map(coin => ({
+          ...coin,
+          x: coin.x - GAME_CONFIG.OBSTACLE_SPEED,
+        })).filter(coin => coin.x > -50);
+      });
+
+      animationRef.current = requestAnimationFrame(gameLoop);
     };
 
-    // Spawn coin in gap
-    if (Math.random() < 0.7) {
-      entities[`coin_${now}`] = {
-        position: { x: SCREEN_WIDTH + 35, y: gapY },
-        type: 'coin',
-        renderer: Coin,
-      };
-    }
+    animationRef.current = requestAnimationFrame(gameLoop);
 
-    entities.spawner.lastSpawn = now;
-  }
-
-  return entities;
-};
-
-const ObstacleMovement = (entities, { dispatch }) => {
-  Object.keys(entities).forEach((key) => {
-    if (key.startsWith('obstacle_') || key.startsWith('coin_')) {
-      const entity = entities[key];
-      entity.position.x -= GAME_CONFIG.OBSTACLE_SPEED;
-
-      // Remove off-screen entities
-      if (entity.position.x < -100) {
-        delete entities[key];
+    return () => {
+      if (animationRef.current) {
+        cancelAnimationFrame(animationRef.current);
       }
+    };
+  }, [gameState, onGameOver]);
 
-      // Score check for obstacles
-      if (key.startsWith('obstacle_') && !entity.scored) {
-        if (entity.position.x + 70 < entities.fish.position.x) {
-          entity.scored = true;
-          dispatch({ type: 'score' });
-        }
-      }
-    }
-  });
+  // Collision detection in separate effect
+  useEffect(() => {
+    if (gameState !== 'playing') return;
 
-  return entities;
-};
+    const fishLeft = fish.x - 20;
+    const fishRight = fish.x + 20;
+    const fishTop = fish.y - 15;
+    const fishBottom = fish.y + 15;
 
-const CollisionDetection = (entities, { dispatch }) => {
-  const fish = entities.fish;
-  if (!fish) return entities;
-
-  const fishLeft = fish.position.x - 20;
-  const fishRight = fish.position.x + 20;
-  const fishTop = fish.position.y - 15;
-  const fishBottom = fish.position.y + 15;
-
-  Object.keys(entities).forEach((key) => {
-    if (key.startsWith('obstacle_')) {
-      const obs = entities[key];
-      const obsLeft = obs.position.x;
-      const obsRight = obs.position.x + 70;
-      const gapTop = obs.position.gapY - GAME_CONFIG.GAP_HEIGHT / 2;
-      const gapBottom = obs.position.gapY + GAME_CONFIG.GAP_HEIGHT / 2;
+    // Check obstacle collisions
+    for (const obs of obstacles) {
+      const obsLeft = obs.x;
+      const obsRight = obs.x + 70;
+      const gapTop = obs.gapY - GAME_CONFIG.GAP_HEIGHT / 2;
+      const gapBottom = obs.gapY + GAME_CONFIG.GAP_HEIGHT / 2;
 
       if (fishRight > obsLeft && fishLeft < obsRight) {
         if (fishTop < gapTop || fishBottom > gapBottom) {
-          dispatch({ type: 'game-over' });
+          onGameOver && onGameOver();
+          return;
         }
       }
-    }
 
-    // Coin collection
-    if (key.startsWith('coin_')) {
-      const coin = entities[key];
-      const dx = fish.position.x - coin.position.x;
-      const dy = fish.position.y - coin.position.y;
-      if (Math.sqrt(dx * dx + dy * dy) < 30) {
-        dispatch({ type: 'coin' });
-        delete entities[key];
+      // Score when passing obstacle
+      if (!obs.scored && obs.x + 70 < fish.x) {
+        obs.scored = true;
+        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+        onScore && onScore();
       }
     }
-  });
 
-  return entities;
-};
+    // Check coin collisions
+    setCoins(prev => {
+      return prev.filter(coin => {
+        const dx = fish.x - coin.x;
+        const dy = fish.y - coin.y;
+        const distance = Math.sqrt(dx * dx + dy * dy);
+        
+        if (distance < 35) {
+          Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+          onCoin && onCoin();
+          return false;
+        }
+        return true;
+      });
+    });
+  }, [fish, obstacles, gameState, onGameOver, onScore, onCoin]);
 
-const GameCanvas = ({ onGameOver, onScore, onCoin }) => {
-  const { gameState, flap, gameRef } = useGame();
-  const engineRef = useRef(null);
-
-  const initialEntities = {
-    fish: {
-      position: { x: 80, y: 200 },
-      velocity: 0,
-      rotation: 0,
-      renderer: Fish,
-    },
-    background: {
-      renderer: Background,
-    },
-    spawner: {
-      lastSpawn: 0,
-    },
-  };
-
-  const onEvent = useCallback((e) => {
-    if (e.type === 'game-over') {
-      onGameOver && onGameOver();
-    } else if (e.type === 'score') {
-      onScore && onScore();
-    } else if (e.type === 'coin') {
-      onCoin && onCoin();
-    }
-  }, [onGameOver, onScore, onCoin]);
-
-  const handleTouch = useCallback(() => {
-    if (gameState === 'playing' && engineRef.current) {
-      // Apply flap to fish entity
-      const entities = engineRef.current.state.entities;
-      if (entities && entities.fish) {
-        entities.fish.velocity = GAME_CONFIG.FLAP_FORCE;
-      }
+  // Handle tap to flap
+  const handleTap = useCallback(() => {
+    if (gameState === 'playing') {
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+      setFish(prev => ({
+        ...prev,
+        velocity: GAME_CONFIG.FLAP_FORCE,
+      }));
     }
   }, [gameState]);
 
@@ -177,16 +183,20 @@ const GameCanvas = ({ onGameOver, onScore, onCoin }) => {
   }
 
   return (
-    <TouchableWithoutFeedback onPress={handleTouch}>
+    <TouchableWithoutFeedback onPress={handleTap}>
       <View style={styles.container}>
-        <GameEngine
-          ref={engineRef}
-          style={styles.gameEngine}
-          systems={[Physics, ObstacleSpawner, ObstacleMovement, CollisionDetection]}
-          entities={initialEntities}
-          onEvent={onEvent}
-          running={gameState === 'playing'}
-        />
+        {/* Render obstacles */}
+        {obstacles.map(obs => (
+          <Obstacle key={obs.id} position={{ x: obs.x, gapY: obs.gapY }} />
+        ))}
+        
+        {/* Render coins */}
+        {coins.map(coin => (
+          <Coin key={coin.id} position={{ x: coin.x, y: coin.y }} />
+        ))}
+        
+        {/* Render fish */}
+        <Fish position={{ x: fish.x, y: fish.y }} rotation={fish.rotation} />
       </View>
     </TouchableWithoutFeedback>
   );
@@ -194,14 +204,7 @@ const GameCanvas = ({ onGameOver, onScore, onCoin }) => {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-  },
-  gameEngine: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
+    ...StyleSheet.absoluteFillObject,
   },
 });
 
