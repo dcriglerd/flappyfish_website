@@ -1,9 +1,18 @@
 import React from 'react';
 import { View, StyleSheet } from 'react-native';
-import Svg, { Ellipse, Polygon, Circle } from 'react-native-svg';
+import Svg, { Ellipse, Polygon, Circle, Defs, LinearGradient, Stop } from 'react-native-svg';
 import { COLORS } from '../constants/config';
 
-const Fish = ({ position, rotation = 0 }) => {
+const Fish = ({ position, rotation = 0, skinColor = COLORS.GOLD }) => {
+  const isRainbow = skinColor === 'rainbow';
+  
+  // Darken color for outlines
+  const getDarkerColor = (color) => {
+    if (color === 'rainbow') return '#996600';
+    // Simple darkening by mixing with black
+    return color;
+  };
+
   return (
     <View
       style={[
@@ -16,35 +25,48 @@ const Fish = ({ position, rotation = 0 }) => {
       ]}
     >
       <Svg width={60} height={50} viewBox="0 0 80 60">
+        {isRainbow && (
+          <Defs>
+            <LinearGradient id="rainbowGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+              <Stop offset="0%" stopColor="#ff0000" />
+              <Stop offset="20%" stopColor="#ffff00" />
+              <Stop offset="40%" stopColor="#00ff00" />
+              <Stop offset="60%" stopColor="#00ffff" />
+              <Stop offset="80%" stopColor="#0000ff" />
+              <Stop offset="100%" stopColor="#ff00ff" />
+            </LinearGradient>
+          </Defs>
+        )}
+        
         {/* Fish body */}
         <Ellipse 
           cx="40" 
           cy="30" 
           rx="28" 
           ry="20" 
-          fill={COLORS.GOLD} 
-          stroke="#CC9900" 
+          fill={isRainbow ? 'url(#rainbowGradient)' : skinColor} 
+          stroke={getDarkerColor(skinColor)} 
           strokeWidth="3" 
         />
         {/* Tail fin */}
         <Polygon 
           points="12,30 -8,12 -8,48" 
-          fill="#FFA500" 
-          stroke="#CC7700" 
+          fill={isRainbow ? 'url(#rainbowGradient)' : skinColor} 
+          stroke={getDarkerColor(skinColor)} 
           strokeWidth="2" 
         />
         {/* Top fin */}
         <Polygon 
           points="35,10 45,-5 55,10" 
-          fill="#FFA500" 
-          stroke="#CC7700" 
+          fill={isRainbow ? 'url(#rainbowGradient)' : skinColor} 
+          stroke={getDarkerColor(skinColor)} 
           strokeWidth="2" 
         />
         {/* Bottom fin */}
         <Polygon 
           points="40,48 50,60 58,48" 
-          fill="#FFA500" 
-          stroke="#CC7700" 
+          fill={isRainbow ? 'url(#rainbowGradient)' : skinColor} 
+          stroke={getDarkerColor(skinColor)} 
           strokeWidth="2" 
         />
         {/* Belly highlight */}
