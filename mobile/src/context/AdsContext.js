@@ -1,8 +1,9 @@
 import React, { createContext, useContext, useState, useEffect, useCallback, useRef } from 'react';
-import { Platform } from 'react-native';
+import { Platform, AppState } from 'react-native';
 import {
   InterstitialAd,
   RewardedAd,
+  AppOpenAd,
   AdEventType,
   RewardedAdEventType,
   TestIds,
@@ -23,12 +24,14 @@ const getAdUnitId = (type) => {
         return TestIds.INTERSTITIAL;
       case 'REWARDED':
         return TestIds.REWARDED;
+      case 'APP_OPEN':
+        return TestIds.APP_OPEN;
       default:
         return TestIds.BANNER;
     }
   }
   
-  // Production IDs (replace with your real AdMob IDs)
+  // Production IDs
   const ids = AD_CONFIG.PRODUCTION_IDS;
   const platformIds = Platform.OS === 'ios' ? ids[type].IOS : ids[type].ANDROID;
   return platformIds;
@@ -39,11 +42,15 @@ export const AdsProvider = ({ children }) => {
   const [adsRemoved, setAdsRemoved] = useState(false);
   const [isInterstitialLoaded, setIsInterstitialLoaded] = useState(false);
   const [isRewardedLoaded, setIsRewardedLoaded] = useState(false);
+  const [isAppOpenLoaded, setIsAppOpenLoaded] = useState(false);
   
   const deathCountRef = useRef(0);
   const interstitialRef = useRef(null);
   const rewardedRef = useRef(null);
+  const appOpenRef = useRef(null);
   const rewardCallbackRef = useRef(null);
+  const appStateRef = useRef(AppState.currentState);
+  const lastAppOpenShowTime = useRef(0);
 
   // Load ads removed status
   useEffect(() => {
@@ -71,14 +78,12 @@ export const AdsProvider = ({ children }) => {
     const unsubscribeClosed = interstitial.addAdEventListener(AdEventType.CLOSED, () => {
       setIsInterstitialLoaded(false);
       console.log('[AdsManager] Interstitial closed, reloading...');
-      // Reload for next time
       interstitial.load();
     });
 
     const unsubscribeError = interstitial.addAdEventListener(AdEventType.ERROR, (error) => {
       console.log('[AdsManager] Interstitial error:', error);
       setIsInterstitialLoaded(false);
-      // Retry loading after delay
       setTimeout(() => interstitial.load(), 5000);
     });
 
@@ -107,7 +112,6 @@ export const AdsProvider = ({ children }) => {
 
     const unsubscribeEarned = rewarded.addAdEventListener(RewardedAdEventType.EARNED_REWARD, (reward) => {
       console.log('[AdsManager] User earned reward:', reward);
-      // Call the reward callback if set
       if (rewardCallbackRef.current) {
         rewardCallbackRef.current(reward);
         rewardCallbackRef.current = null;
@@ -123,7 +127,6 @@ export const AdsProvider = ({ children }) => {
     const unsubscribeError = rewarded.addAdEventListener(AdEventType.ERROR, (error) => {
       console.log('[AdsManager] Rewarded ad error:', error);
       setIsRewardedLoaded(false);
-      // Retry loading after delay
       setTimeout(() => rewarded.load(), 5000);
     });
 
@@ -137,6 +140,90 @@ export const AdsProvider = ({ children }) => {
       unsubscribeError();
     };
   }, [adsRemoved]);
+
+  // Initialize App Open Ad
+  useEffect(() => {
+    if (adsRemoved) return;
+
+    const appOpen = AppOpenAd.createForAdRequest(getAdUnitId('APP_OPEN'), {
+      requestNonPersonalizedAdsOnly: true,
+    });
+
+    const unsubscribeLoaded = appOpen.addAdEventListener(AdEventType.LOADED, () => {
+      setIsAppOpenLoaded(true);
+      console.log('[AdsManager] App Open ad loaded');
+    });
+
+    const unsubscribeClosed = appOpen.addAdEventListener(AdEventType.CLOSED, () => {
+      setIsAppOpenLoaded(false);
+      console.log('[AdsManager] App Open ad closed, reloading...');
+      appOpen.load();
+    });
+
+    const unsubscribeError = appOpen.addAdEventListener(AdEventType.ERROR, (error) => {
+      console.log('[AdsManager] App Open ad error:', error);
+      setIsAppOpenLoaded(false);
+      setTimeout(() => appOpen.load(), 5000);
+    });
+
+    appOpenRef.current = appOpen;
+    appOpen.load();
+
+    return () => {
+      unsubscribeLoaded();
+      unsubscribeClosed();
+      unsubscribeError();
+    };
+  }, [adsRemoved]);
+
+  // Show App Open ad when app comes to foreground
+  useEffect(() => {
+    if (adsRemoved) return;
+
+    const subscription = AppState.addEventListener('change', (nextAppState) => {
+      // App came to foreground
+      if (
+        appStateRef.current.match(/inactive|background/) &&
+        nextAppState === 'active'
+      ) {
+        const now = Date.now();
+        // Don't show more than once every 30 seconds
+        if (now - lastAppOpenShowTime.current > 30000) {
+          showAppOpenAd();
+        }
+      }
+      appStateRef.current = nextAppState;
+    });
+
+    return () => {
+      subscription.remove();
+    };
+  }, [adsRemoved]);
+
+  // Show App Open ad on initial launch
+  useEffect(() => {
+    if (adsRemoved) return;
+    
+    // Small delay to let the ad load
+    const timer = setTimeout(() => {
+      if (isAppOpenLoaded) {
+        showAppOpenAd();
+      }
+    }, 2000);
+
+    return () => clearTimeout(timer);
+  }, [isAppOpenLoaded, adsRemoved]);
+
+  // Show App Open Ad
+  const showAppOpenAd = useCallback(() => {
+    if (adsRemoved) return;
+    
+    if (isAppOpenLoaded && appOpenRef.current) {
+      console.log('[AdsManager] Showing App Open ad...');
+      lastAppOpenShowTime.current = Date.now();
+      appOpenRef.current.show();
+    }
+  }, [adsRemoved, isAppOpenLoaded]);
 
   // Called on game over - tracks deaths for interstitial frequency
   const onGameOver = useCallback(() => {
@@ -175,7 +262,6 @@ export const AdsProvider = ({ children }) => {
       return true;
     }
     console.log('[AdsManager] Rewarded ad not ready, granting reward anyway');
-    // If ad not ready, grant reward anyway (better UX)
     onReward && onReward({ amount: 1, type: 'revive' });
     return false;
   }, [isRewardedLoaded]);
@@ -202,9 +288,11 @@ export const AdsProvider = ({ children }) => {
     adsRemoved,
     isInterstitialLoaded,
     isRewardedLoaded,
+    isAppOpenLoaded,
     onGameOver,
     showInterstitial,
     showRewardedAd,
+    showAppOpenAd,
     removeAds,
     hideBanner,
     showBannerAd,
