@@ -132,13 +132,13 @@ export const ACHIEVEMENTS = [
 export const ENEMIES = {
   shark: {
     name: 'Shark',
-    speed: 4,
+    speed: 1.8,
     size: 80,
     color: '#708090',
   },
   octopus: {
     name: 'Octopus',
-    speed: 3,
+    speed: 1.5,
     size: 70,
     color: '#E75480',
   },
