@@ -1,17 +1,27 @@
 import { useRef, useCallback, useEffect } from 'react';
 import { Audio } from 'expo-av';
 
+// Pre-load sound assets
+const SOUNDS = {
+  flap: require('../../assets/sounds/flap.wav'),
+  coin: require('../../assets/sounds/coin.wav'),
+  score: require('../../assets/sounds/score.wav'),
+  gameover: require('../../assets/sounds/gameover.wav'),
+};
+
 /**
  * Custom hook for game audio using expo-av
- * Generates procedural sounds for game events
+ * Provides sound effects for game events
  */
 const useGameAudio = () => {
-  const soundsRef = useRef({});
+  const loadedSoundsRef = useRef({});
   const isMutedRef = useRef(false);
   const isInitializedRef = useRef(false);
 
-  // Initialize audio mode on mount
+  // Initialize audio mode and preload sounds
   useEffect(() => {
+    let mounted = true;
+
     const initAudio = async () => {
       try {
         await Audio.setAudioModeAsync({
@@ -20,122 +30,80 @@ const useGameAudio = () => {
           staysActiveInBackground: false,
           shouldDuckAndroid: true,
         });
-        isInitializedRef.current = true;
+        
+        // Preload all sounds
+        for (const [key, source] of Object.entries(SOUNDS)) {
+          try {
+            const { sound } = await Audio.Sound.createAsync(source, { volume: 0.5 });
+            if (mounted) {
+              loadedSoundsRef.current[key] = sound;
+            }
+          } catch (e) {
+            console.log(`[Audio] Failed to load ${key}:`, e.message);
+          }
+        }
+        
+        if (mounted) {
+          isInitializedRef.current = true;
+          console.log('[Audio] Initialized with sounds:', Object.keys(loadedSoundsRef.current));
+        }
       } catch (error) {
         console.log('[Audio] Init error:', error);
       }
     };
-    
+
     initAudio();
 
     return () => {
+      mounted = false;
       // Cleanup sounds on unmount
-      Object.values(soundsRef.current).forEach(async (sound) => {
+      Object.values(loadedSoundsRef.current).forEach(async (sound) => {
         try {
-          if (sound) await sound.unloadAsync();
+          await sound.unloadAsync();
         } catch (e) {}
       });
+      loadedSoundsRef.current = {};
     };
   }, []);
 
-  // Helper to create and play a simple beep tone using the Audio API
-  const playGeneratedSound = useCallback(async (frequency, duration, volume = 0.5) => {
-    if (isMutedRef.current || !isInitializedRef.current) return;
+  // Helper to play a preloaded sound
+  const playSound = useCallback(async (soundKey, volume = 0.5) => {
+    if (isMutedRef.current) return;
     
-    // expo-av doesn't support programmatic tone generation directly
-    // We'll use pre-created audio or simple approach
-    // For now, we use haptics as audio feedback substitute in dev
+    const sound = loadedSoundsRef.current[soundKey];
+    if (!sound) {
+      console.log(`[Audio] Sound ${soundKey} not loaded`);
+      return;
+    }
+    
+    try {
+      await sound.setPositionAsync(0);
+      await sound.setVolumeAsync(volume);
+      await sound.playAsync();
+    } catch (error) {
+      console.log(`[Audio] Error playing ${soundKey}:`, error.message);
+    }
   }, []);
 
   // Play flap/swim sound - bubble bloop
-  const playFlapSound = useCallback(async () => {
-    if (isMutedRef.current) return;
-    
-    try {
-      const { sound } = await Audio.Sound.createAsync(
-        require('../../assets/sounds/flap.mp3'),
-        { volume: 0.4 }
-      );
-      soundsRef.current.flap = sound;
-      await sound.playAsync();
-      
-      // Auto unload after playing
-      sound.setOnPlaybackStatusUpdate((status) => {
-        if (status.didJustFinish) {
-          sound.unloadAsync();
-        }
-      });
-    } catch (error) {
-      // Fallback: no sound file, silently fail
-      console.log('[Audio] Flap sound not available');
-    }
-  }, []);
+  const playFlapSound = useCallback(() => {
+    playSound('flap', 0.4);
+  }, [playSound]);
 
   // Play score sound - cheerful ding
-  const playScoreSound = useCallback(async () => {
-    if (isMutedRef.current) return;
-    
-    try {
-      const { sound } = await Audio.Sound.createAsync(
-        require('../../assets/sounds/score.mp3'),
-        { volume: 0.5 }
-      );
-      soundsRef.current.score = sound;
-      await sound.playAsync();
-      
-      sound.setOnPlaybackStatusUpdate((status) => {
-        if (status.didJustFinish) {
-          sound.unloadAsync();
-        }
-      });
-    } catch (error) {
-      console.log('[Audio] Score sound not available');
-    }
-  }, []);
+  const playScoreSound = useCallback(() => {
+    playSound('score', 0.5);
+  }, [playSound]);
 
   // Play coin collect sound - sparkly
-  const playCoinSound = useCallback(async () => {
-    if (isMutedRef.current) return;
-    
-    try {
-      const { sound } = await Audio.Sound.createAsync(
-        require('../../assets/sounds/coin.mp3'),
-        { volume: 0.5 }
-      );
-      soundsRef.current.coin = sound;
-      await sound.playAsync();
-      
-      sound.setOnPlaybackStatusUpdate((status) => {
-        if (status.didJustFinish) {
-          sound.unloadAsync();
-        }
-      });
-    } catch (error) {
-      console.log('[Audio] Coin sound not available');
-    }
-  }, []);
+  const playCoinSound = useCallback(() => {
+    playSound('coin', 0.5);
+  }, [playSound]);
 
   // Play game over sound - sad descending tone
-  const playGameOverSound = useCallback(async () => {
-    if (isMutedRef.current) return;
-    
-    try {
-      const { sound } = await Audio.Sound.createAsync(
-        require('../../assets/sounds/gameover.mp3'),
-        { volume: 0.6 }
-      );
-      soundsRef.current.gameover = sound;
-      await sound.playAsync();
-      
-      sound.setOnPlaybackStatusUpdate((status) => {
-        if (status.didJustFinish) {
-          sound.unloadAsync();
-        }
-      });
-    } catch (error) {
-      console.log('[Audio] Game over sound not available');
-    }
-  }, []);
+  const playGameOverSound = useCallback(() => {
+    playSound('gameover', 0.6);
+  }, [playSound]);
 
   // Set muted state
   const setMuted = useCallback((muted) => {
