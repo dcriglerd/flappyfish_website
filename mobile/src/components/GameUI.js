@@ -2,7 +2,7 @@ import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { COLORS } from '../constants/config';
 
-const GameUI = ({ score, highScore, coins, onPause }) => {
+const GameUI = ({ score, highScore, coins, onPause, isMuted, onToggleMute }) => {
   return (
     <View style={styles.container}>
       {/* Top HUD */}
@@ -19,9 +19,14 @@ const GameUI = ({ score, highScore, coins, onPause }) => {
           <Text style={styles.coinsValue}>{coins}</Text>
         </View>
 
+        {/* Sound Toggle */}
+        <TouchableOpacity style={styles.iconButton} onPress={onToggleMute}>
+          <Text style={styles.iconText}>{isMuted ? '🔇' : '🔊'}</Text>
+        </TouchableOpacity>
+
         {/* Pause Button */}
         <TouchableOpacity style={styles.pauseButton} onPress={onPause}>
-          <Text style={styles.pauseText}>||</Text>
+          <Text style={styles.pauseText}>⏸</Text>
         </TouchableOpacity>
       </View>
     </View>
@@ -75,6 +80,17 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: '700',
   },
+  iconButton: {
+    backgroundColor: 'rgba(0,0,0,0.3)',
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  iconText: {
+    fontSize: 20,
+  },
   pauseButton: {
     backgroundColor: 'rgba(0,0,0,0.3)',
     width: 44,
@@ -84,9 +100,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   pauseText: {
-    color: COLORS.WHITE,
-    fontSize: 18,
-    fontWeight: '900',
+    fontSize: 20,
   },
 });
 
