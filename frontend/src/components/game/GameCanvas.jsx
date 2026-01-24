@@ -83,37 +83,78 @@ const GameCanvas = ({
   }, [getSkinColor, activePowerUp]);
 
   const drawObstacle = useCallback((ctx, obstacle) => {
-    const gradient = ctx.createLinearGradient(obstacle.x, 0, obstacle.x + 60, 0);
-    gradient.addColorStop(0, '#2E8B57');
-    gradient.addColorStop(0.5, '#3CB371');
-    gradient.addColorStop(1, '#2E8B57');
+    const pipeWidth = 70;
+    const capHeight = 25;
+    const capWidth = 80;
+    const topPipeHeight = obstacle.gapY - GAME_CONFIG.gapHeight / 2;
+    const bottomPipeY = obstacle.gapY + GAME_CONFIG.gapHeight / 2;
+    const bottomPipeHeight = 600 - bottomPipeY;
 
-    ctx.fillStyle = gradient;
+    // Pipe gradient (glossy green)
+    const pipeGradient = ctx.createLinearGradient(obstacle.x, 0, obstacle.x + pipeWidth, 0);
+    pipeGradient.addColorStop(0, '#228B22');
+    pipeGradient.addColorStop(0.2, '#32CD32');
+    pipeGradient.addColorStop(0.5, '#7CFC00');
+    pipeGradient.addColorStop(0.8, '#32CD32');
+    pipeGradient.addColorStop(1, '#228B22');
 
-    // Top coral/seaweed
+    // Cap gradient
+    const capGradient = ctx.createLinearGradient(obstacle.x - 5, 0, obstacle.x + capWidth - 5, 0);
+    capGradient.addColorStop(0, '#1B6B1B');
+    capGradient.addColorStop(0.2, '#228B22');
+    capGradient.addColorStop(0.5, '#3CB371');
+    capGradient.addColorStop(0.8, '#228B22');
+    capGradient.addColorStop(1, '#1B6B1B');
+
+    // TOP PIPE
+    // Main pipe body
+    ctx.fillStyle = pipeGradient;
+    ctx.fillRect(obstacle.x, 0, pipeWidth, topPipeHeight - capHeight);
+
+    // Pipe cap
+    ctx.fillStyle = capGradient;
     ctx.beginPath();
-    ctx.roundRect(obstacle.x, 0, 60, obstacle.gapY - GAME_CONFIG.gapHeight / 2, [0, 0, 10, 10]);
+    ctx.roundRect(obstacle.x - 5, topPipeHeight - capHeight, capWidth, capHeight, [0, 0, 6, 6]);
     ctx.fill();
 
-    // Bottom coral/seaweed
+    // Cap highlight
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.15)';
+    ctx.fillRect(obstacle.x + 5, topPipeHeight - capHeight + 3, capWidth - 25, capHeight - 6);
+
+    // Pipe edge shadow
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.2)';
+    ctx.fillRect(obstacle.x + pipeWidth - 8, 0, 8, topPipeHeight - capHeight);
+
+    // BOTTOM PIPE
+    // Main pipe body
+    ctx.fillStyle = pipeGradient;
+    ctx.fillRect(obstacle.x, bottomPipeY + capHeight, pipeWidth, bottomPipeHeight - capHeight);
+
+    // Pipe cap
+    ctx.fillStyle = capGradient;
     ctx.beginPath();
-    ctx.roundRect(
-      obstacle.x, 
-      obstacle.gapY + GAME_CONFIG.gapHeight / 2, 
-      60, 
-      600 - (obstacle.gapY + GAME_CONFIG.gapHeight / 2),
-      [10, 10, 0, 0]
-    );
+    ctx.roundRect(obstacle.x - 5, bottomPipeY, capWidth, capHeight, [6, 6, 0, 0]);
     ctx.fill();
 
-    // Decorative bubbles on obstacles
-    ctx.fillStyle = 'rgba(255, 255, 255, 0.3)';
-    for (let i = 0; i < 3; i++) {
-      ctx.beginPath();
-      ctx.arc(obstacle.x + 30 + Math.sin(Date.now() / 200 + i) * 10, obstacle.gapY - 100 + i * 30, 5, 0, Math.PI * 2);
-      ctx.fill();
-    }
+    // Cap highlight
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.15)';
+    ctx.fillRect(obstacle.x + 5, bottomPipeY + 3, capWidth - 25, capHeight - 6);
+
+    // Pipe edge shadow
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.2)';
+    ctx.fillRect(obstacle.x + pipeWidth - 8, bottomPipeY + capHeight, 8, bottomPipeHeight - capHeight);
+
+    // Dark outline
+    ctx.strokeStyle = '#145214';
+    ctx.lineWidth = 2;
+    // Top pipe outline
+    ctx.strokeRect(obstacle.x, 0, pipeWidth, topPipeHeight - capHeight);
+    ctx.strokeRect(obstacle.x - 5, topPipeHeight - capHeight, capWidth, capHeight);
+    // Bottom pipe outline
+    ctx.strokeRect(obstacle.x, bottomPipeY + capHeight, pipeWidth, bottomPipeHeight - capHeight);
+    ctx.strokeRect(obstacle.x - 5, bottomPipeY, capWidth, capHeight);
   }, []);
+
 
   const drawEnemy = useCallback((ctx, enemy) => {
     if (!enemy) return;
