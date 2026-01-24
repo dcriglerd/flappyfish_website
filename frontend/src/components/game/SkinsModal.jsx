@@ -55,8 +55,8 @@ const SkinsModal = ({ isOpen, onClose, coins, selectedSkin, onSelectSkin, onUnlo
         )}
 
         {/* Skins Grid */}
-        <div className="p-4 overflow-y-auto max-h-[400px]">
-          <div className="grid grid-cols-2 gap-4">
+        <div className="p-4 overflow-y-auto max-h-[450px]">
+          <div className="grid grid-cols-2 gap-3">
             {FISH_SKINS.map((skin) => {
               const isUnlocked = unlockedSkins.includes(skin.id);
               const isSelected = selectedSkin?.id === skin.id;
