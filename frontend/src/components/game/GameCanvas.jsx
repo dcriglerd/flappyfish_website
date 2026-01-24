@@ -735,8 +735,8 @@ const GameCanvas = ({
   return (
     <canvas
       ref={canvasRef}
-      width={1200}
-      height={900}
+      width={600}
+      height={450}
       onClick={handleInteraction}
       onTouchStart={handleInteraction}
       className="rounded-2xl shadow-2xl cursor-pointer w-full h-full"
