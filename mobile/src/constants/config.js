@@ -1,43 +1,29 @@
 // Google Mobile Ads Configuration
-// Replace with your actual AdMob IDs for production
+// The App IDs are configured in app.json
+// Ad Unit IDs are configured here
 
 export const AD_CONFIG = {
-  // Test IDs (safe to use during development)
-  TEST_IDS: {
-    BANNER: {
-      ANDROID: 'ca-app-pub-3940256099942544/6300978111',
-      IOS: 'ca-app-pub-3940256099942544/2934735716',
-    },
-    INTERSTITIAL: {
-      ANDROID: 'ca-app-pub-3940256099942544/1033173712',
-      IOS: 'ca-app-pub-3940256099942544/4411468910',
-    },
-    REWARDED: {
-      ANDROID: 'ca-app-pub-3940256099942544/5224354917',
-      IOS: 'ca-app-pub-3940256099942544/1712485313',
-    },
-  },
-
-  // Production IDs (replace with your actual AdMob IDs)
-  PRODUCTION_IDS: {
-    BANNER: {
-      ANDROID: 'YOUR_ANDROID_BANNER_ID',
-      IOS: 'YOUR_IOS_BANNER_ID',
-    },
-    INTERSTITIAL: {
-      ANDROID: 'YOUR_ANDROID_INTERSTITIAL_ID',
-      IOS: 'YOUR_IOS_INTERSTITIAL_ID',
-    },
-    REWARDED: {
-      ANDROID: 'YOUR_ANDROID_REWARDED_ID',
-      IOS: 'YOUR_IOS_REWARDED_ID',
-    },
-  },
-
-  // Set to false for production
+  // Use test IDs during development (set to false for production)
   USE_TEST_IDS: true,
 
-  // Interstitial frequency (show every N deaths)
+  // Production Ad Unit IDs (replace with your real AdMob IDs)
+  // Create these at https://admob.google.com
+  PRODUCTION_IDS: {
+    BANNER: {
+      ANDROID: 'ca-app-pub-XXXXXXXXXXXXXXXX/XXXXXXXXXX',
+      IOS: 'ca-app-pub-XXXXXXXXXXXXXXXX/XXXXXXXXXX',
+    },
+    INTERSTITIAL: {
+      ANDROID: 'ca-app-pub-XXXXXXXXXXXXXXXX/XXXXXXXXXX',
+      IOS: 'ca-app-pub-XXXXXXXXXXXXXXXX/XXXXXXXXXX',
+    },
+    REWARDED: {
+      ANDROID: 'ca-app-pub-XXXXXXXXXXXXXXXX/XXXXXXXXXX',
+      IOS: 'ca-app-pub-XXXXXXXXXXXXXXXX/XXXXXXXXXX',
+    },
+  },
+
+  // Interstitial frequency (show every N game overs)
   INTERSTITIAL_FREQUENCY: 3,
 };
 
