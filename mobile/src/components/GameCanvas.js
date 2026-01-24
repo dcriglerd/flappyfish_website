@@ -201,7 +201,11 @@ const GameCanvas = ({ onGameOver, onScore, onCoin, onFlap, selectedSkin }) => {
         ))}
         
         {/* Render fish */}
-        <Fish position={{ x: fish.x, y: fish.y }} rotation={fish.rotation} />
+        <Fish 
+          position={{ x: fish.x, y: fish.y }} 
+          rotation={fish.rotation} 
+          skinColor={selectedSkin?.color}
+        />
       </View>
     </TouchableWithoutFeedback>
   );
