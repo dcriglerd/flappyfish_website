@@ -3,7 +3,6 @@ import {
   View,
   StyleSheet,
   Dimensions,
-  TouchableWithoutFeedback,
 } from 'react-native';
 import * as Haptics from 'expo-haptics';
 
@@ -19,22 +18,6 @@ import Background from '../components/Background';
 import GameCanvas from '../components/GameCanvas';
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
-
-/*
- * GAME HIERARCHY (React Native Implementation):
- * ├── Main Camera (View container)
- * ├── Canvas
- * │   ├── Background
- * │   ├── Player (Fish)
- * │   ├── Spawner (Obstacles)
- * │   ├── GameOverPanel
- * │   │   └── RetryButton
- * │   └── ScoreText (GameUI)
- * └── AdsManager
- *     ├── BannerAd (bottom)
- *     ├── InterstitialAd (every 3 deaths)
- *     └── RewardedAd (revive)
- */
 
 const FlappyFishGame = () => {
   const {
@@ -78,10 +61,10 @@ const FlappyFishGame = () => {
   const handleGameOver = useCallback(() => {
     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
     gameOver();
-    onAdsGameOver(); // Trigger ads manager
+    onAdsGameOver();
   }, [gameOver, onAdsGameOver]);
 
-  // Handle retry (reload scene)
+  // Handle retry
   const handleRetry = useCallback(() => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
     startGame();
@@ -89,16 +72,9 @@ const FlappyFishGame = () => {
 
   // Handle revive with rewarded ad
   const handleRevive = useCallback(() => {
-    const adShown = showRewardedAd(() => {
-      // Reward callback - revive the player
+    showRewardedAd(() => {
       revive();
     });
-
-    if (!adShown) {
-      // If ad not ready, revive anyway (for testing)
-      console.log('[Game] Rewarded ad not ready, reviving anyway');
-      revive();
-    }
   }, [showRewardedAd, revive]);
 
   // Handle return to menu
@@ -108,13 +84,11 @@ const FlappyFishGame = () => {
 
   // Handle score
   const handleScore = useCallback(() => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     incrementScore();
   }, [incrementScore]);
 
   // Handle coin collection
   const handleCoin = useCallback(() => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     addCoins(1);
   }, [addCoins]);
 
@@ -123,16 +97,13 @@ const FlappyFishGame = () => {
     pauseGame();
   }, [pauseGame]);
 
-  // Open shop (placeholder)
+  // Placeholder shop/skins handlers
   const handleOpenShop = useCallback(() => {
-    console.log('Open Shop');
-    // TODO: Implement shop modal
+    console.log('Shop - Coming soon!');
   }, []);
 
-  // Open skins (placeholder)
   const handleOpenSkins = useCallback(() => {
-    console.log('Open Skins');
-    // TODO: Implement skins modal
+    console.log('Skins - Coming soon!');
   }, []);
 
   return (
@@ -141,13 +112,11 @@ const FlappyFishGame = () => {
       <Background />
 
       {/* Game Canvas - Only during gameplay */}
-      {gameState === 'playing' && (
-        <GameCanvas
-          onGameOver={handleGameOver}
-          onScore={handleScore}
-          onCoin={handleCoin}
-        />
-      )}
+      <GameCanvas
+        onGameOver={handleGameOver}
+        onScore={handleScore}
+        onCoin={handleCoin}
+      />
 
       {/* Game UI - Score, Pause button */}
       {gameState === 'playing' && (
@@ -170,7 +139,7 @@ const FlappyFishGame = () => {
         />
       )}
 
-      {/* Game Over Panel with RetryButton */}
+      {/* Game Over Panel */}
       {gameState === 'gameover' && (
         <GameOverScreen
           score={score}
