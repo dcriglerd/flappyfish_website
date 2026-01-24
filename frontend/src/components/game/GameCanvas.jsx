@@ -227,50 +227,200 @@ const GameCanvas = ({
     ctx.restore();
   }, []);
 
+  // Parallax offset tracking
+  const parallaxRef = useRef({ offset: 0 });
+
   const drawBackground = useCallback((ctx, canvas) => {
-    // Ocean gradient
-    const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
-    gradient.addColorStop(0, '#0077B6');
-    gradient.addColorStop(0.5, '#0096C7');
-    gradient.addColorStop(1, '#00B4D8');
-    ctx.fillStyle = gradient;
+    const time = Date.now() / 1000;
+    
+    // Update parallax offset when playing
+    if (gameState === 'playing') {
+      parallaxRef.current.offset += 2;
+    }
+    const offset = parallaxRef.current.offset;
+
+    // Sky gradient (night sky effect)
+    const skyGradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
+    skyGradient.addColorStop(0, '#1a1a4e');
+    skyGradient.addColorStop(0.4, '#2d3a8c');
+    skyGradient.addColorStop(0.7, '#4a6fa5');
+    skyGradient.addColorStop(1, '#6bb3d9');
+    ctx.fillStyle = skyGradient;
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-    // Light rays
-    ctx.fillStyle = 'rgba(255, 255, 255, 0.03)';
-    for (let i = 0; i < 5; i++) {
+    // Stars (very slow parallax - almost static)
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
+    for (let i = 0; i < 30; i++) {
+      const starX = ((i * 73 + 50) % canvas.width + offset * 0.02) % canvas.width;
+      const starY = (i * 37 + 20) % (canvas.height * 0.5);
+      const starSize = 1 + (i % 3);
       ctx.beginPath();
-      ctx.moveTo(100 + i * 150, 0);
-      ctx.lineTo(50 + i * 150, canvas.height);
-      ctx.lineTo(150 + i * 150, canvas.height);
-      ctx.closePath();
+      ctx.arc(starX, starY, starSize, 0, Math.PI * 2);
       ctx.fill();
     }
 
-    // Animated bubbles in background
-    ctx.fillStyle = 'rgba(255, 255, 255, 0.2)';
-    const time = Date.now() / 1000;
-    for (let i = 0; i < 20; i++) {
-      const x = (i * 50 + time * 20) % canvas.width;
-      const y = canvas.height - ((time * 30 + i * 40) % canvas.height);
-      const size = 3 + Math.sin(i) * 2;
-      ctx.beginPath();
-      ctx.arc(x, y, size, 0, Math.PI * 2);
-      ctx.fill();
-    }
-
-    // Sea floor
-    ctx.fillStyle = '#1A5276';
+    // Moon (slowest parallax)
+    const moonX = ((canvas.width * 0.75) - offset * 0.03) % (canvas.width + 150) + 75;
+    ctx.fillStyle = '#e8e8f0';
     ctx.beginPath();
-    ctx.moveTo(0, canvas.height - 30);
-    for (let x = 0; x <= canvas.width; x += 20) {
-      ctx.lineTo(x, canvas.height - 30 + Math.sin(x / 30) * 10);
+    ctx.arc(moonX, 80, 50, 0, Math.PI * 2);
+    ctx.fill();
+    // Moon craters
+    ctx.fillStyle = 'rgba(180, 200, 210, 0.4)';
+    ctx.beginPath();
+    ctx.arc(moonX - 15, 70, 12, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.beginPath();
+    ctx.arc(moonX + 20, 90, 8, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.beginPath();
+    ctx.arc(moonX - 5, 100, 6, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Hot air balloons (very slow parallax)
+    const drawBalloon = (bx, by, size, color) => {
+      ctx.fillStyle = color;
+      ctx.beginPath();
+      ctx.ellipse(bx, by, size, size * 1.2, 0, 0, Math.PI * 2);
+      ctx.fill();
+      // Basket
+      ctx.fillStyle = '#4a3728';
+      ctx.fillRect(bx - size * 0.3, by + size * 1.4, size * 0.6, size * 0.4);
+      // Ropes
+      ctx.strokeStyle = '#4a3728';
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(bx - size * 0.3, by + size * 1.4);
+      ctx.lineTo(bx - size * 0.5, by + size);
+      ctx.moveTo(bx + size * 0.3, by + size * 1.4);
+      ctx.lineTo(bx + size * 0.5, by + size);
+      ctx.stroke();
+    };
+    drawBalloon((600 - offset * 0.05) % (canvas.width + 200), 150, 25, 'rgba(128, 90, 150, 0.7)');
+    drawBalloon((350 - offset * 0.04) % (canvas.width + 200), 200, 18, 'rgba(150, 100, 140, 0.6)');
+
+    // Far cityscape silhouette (slow parallax)
+    ctx.fillStyle = 'rgba(60, 50, 90, 0.6)';
+    const cityBaseY = canvas.height - 180;
+    for (let i = 0; i < 15; i++) {
+      const buildingX = ((i * 80 - offset * 0.15) % (canvas.width + 200)) - 100;
+      const buildingHeight = 60 + Math.sin(i * 1.5) * 40 + (i % 3) * 20;
+      const buildingWidth = 30 + (i % 4) * 15;
+      ctx.fillRect(buildingX, cityBaseY - buildingHeight, buildingWidth, buildingHeight + 100);
+      // Windows
+      ctx.fillStyle = 'rgba(255, 255, 150, 0.3)';
+      for (let wy = 0; wy < buildingHeight - 10; wy += 15) {
+        for (let wx = 5; wx < buildingWidth - 5; wx += 12) {
+          if (Math.random() > 0.3) {
+            ctx.fillRect(buildingX + wx, cityBaseY - buildingHeight + wy + 5, 6, 8);
+          }
+        }
+      }
+      ctx.fillStyle = 'rgba(60, 50, 90, 0.6)';
     }
+
+    // Far clouds layer (slow parallax)
+    ctx.fillStyle = 'rgba(120, 180, 220, 0.4)';
+    for (let i = 0; i < 6; i++) {
+      const cloudX = ((i * 200 + 100 - offset * 0.2) % (canvas.width + 300)) - 150;
+      const cloudY = 280 + (i % 3) * 40;
+      drawCloud(ctx, cloudX, cloudY, 80 + (i % 2) * 30);
+    }
+
+    // Mid clouds layer (medium parallax)
+    ctx.fillStyle = 'rgba(150, 210, 240, 0.5)';
+    for (let i = 0; i < 5; i++) {
+      const cloudX = ((i * 220 + 50 - offset * 0.4) % (canvas.width + 350)) - 175;
+      const cloudY = 320 + (i % 2) * 60;
+      drawCloud(ctx, cloudX, cloudY, 100 + (i % 3) * 20);
+    }
+
+    // Near clouds layer (faster parallax)
+    ctx.fillStyle = 'rgba(180, 230, 255, 0.6)';
+    for (let i = 0; i < 4; i++) {
+      const cloudX = ((i * 280 - offset * 0.7) % (canvas.width + 400)) - 200;
+      const cloudY = 380 + (i % 2) * 30;
+      drawCloud(ctx, cloudX, cloudY, 120 + (i % 2) * 30);
+    }
+
+    // Animated bubbles rising
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.25)';
+    for (let i = 0; i < 15; i++) {
+      const bubbleX = ((i * 60 + time * 15) % canvas.width);
+      const bubbleY = canvas.height - ((time * 40 + i * 50) % (canvas.height + 100));
+      const bubbleSize = 2 + Math.sin(i + time) * 2;
+      ctx.beginPath();
+      ctx.arc(bubbleX, bubbleY, bubbleSize, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    // Ground layer with grass (fastest parallax - matches obstacles)
+    drawGround(ctx, canvas, offset);
+  }, [gameState]);
+
+  // Helper function to draw clouds
+  const drawCloud = (ctx, x, y, size) => {
+    ctx.beginPath();
+    ctx.arc(x, y, size * 0.5, 0, Math.PI * 2);
+    ctx.arc(x + size * 0.4, y - size * 0.15, size * 0.4, 0, Math.PI * 2);
+    ctx.arc(x + size * 0.8, y, size * 0.45, 0, Math.PI * 2);
+    ctx.arc(x + size * 0.35, y + size * 0.2, size * 0.35, 0, Math.PI * 2);
+    ctx.fill();
+  };
+
+  // Helper function to draw ground
+  const drawGround = (ctx, canvas, offset) => {
+    const groundY = canvas.height - 50;
+    
+    // Grass layer
+    ctx.fillStyle = '#4CAF50';
+    ctx.beginPath();
+    ctx.moveTo(0, groundY);
+    for (let x = 0; x <= canvas.width; x += 15) {
+      const grassHeight = 8 + Math.sin((x + offset) / 20) * 5;
+      ctx.lineTo(x, groundY - grassHeight);
+    }
+    ctx.lineTo(canvas.width, groundY);
     ctx.lineTo(canvas.width, canvas.height);
     ctx.lineTo(0, canvas.height);
     ctx.closePath();
     ctx.fill();
-  }, []);
+
+    // Stone/brick base layer
+    ctx.fillStyle = '#37474F';
+    ctx.fillRect(0, groundY + 5, canvas.width, canvas.height - groundY);
+
+    // Brick pattern
+    ctx.fillStyle = '#455A64';
+    const brickWidth = 40;
+    const brickHeight = 15;
+    for (let row = 0; row < 3; row++) {
+      const rowOffset = row % 2 === 0 ? 0 : brickWidth / 2;
+      for (let col = -1; col < canvas.width / brickWidth + 2; col++) {
+        const brickX = ((col * brickWidth + rowOffset - offset * 0.5) % (canvas.width + brickWidth * 2)) - brickWidth;
+        ctx.strokeStyle = '#263238';
+        ctx.lineWidth = 2;
+        ctx.strokeRect(brickX, groundY + 8 + row * brickHeight, brickWidth - 2, brickHeight - 2);
+      }
+    }
+
+    // Grass tufts on top
+    ctx.fillStyle = '#66BB6A';
+    for (let i = 0; i < 30; i++) {
+      const tuftX = ((i * 35 - offset) % (canvas.width + 100)) - 50;
+      const tuftY = groundY - 5;
+      ctx.beginPath();
+      ctx.moveTo(tuftX, tuftY);
+      ctx.lineTo(tuftX - 3, tuftY - 12 - Math.sin(i) * 4);
+      ctx.lineTo(tuftX + 3, tuftY);
+      ctx.fill();
+      ctx.beginPath();
+      ctx.moveTo(tuftX + 5, tuftY);
+      ctx.lineTo(tuftX + 8, tuftY - 10 - Math.cos(i) * 3);
+      ctx.lineTo(tuftX + 11, tuftY);
+      ctx.fill();
+    }
+  };
 
   const checkCollision = useCallback((fish, obstacle) => {
     const fishLeft = fish.x - 20;
