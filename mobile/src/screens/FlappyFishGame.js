@@ -16,9 +16,13 @@ import GameUI from '../components/GameUI';
 import BannerAdComponent from '../components/BannerAdComponent';
 import Background from '../components/Background';
 import GameCanvas from '../components/GameCanvas';
+import ShopModal from '../components/ShopModal';
+import SkinsModal from '../components/SkinsModal';
 
 const FlappyFishGame = () => {
   const [isMuted, setIsMuted] = useState(false);
+  const [showShop, setShowShop] = useState(false);
+  const [showSkins, setShowSkins] = useState(false);
   
   const {
     gameState,
@@ -33,6 +37,13 @@ const FlappyFishGame = () => {
     revive,
     addCoins,
     incrementScore,
+    // Skins
+    unlockedSkins,
+    selectedSkin,
+    unlockSkin,
+    selectSkin,
+    // Power-ups
+    buyPowerUp,
   } = useGame();
 
   const {
@@ -40,6 +51,8 @@ const FlappyFishGame = () => {
     showRewardedAd,
     hideBanner,
     showBannerAd,
+    removeAds,
+    adsRemoved,
   } = useAds();
 
   const {
@@ -125,14 +138,45 @@ const FlappyFishGame = () => {
     setIsMuted(prev => !prev);
   }, []);
 
-  // Placeholder handlers
+  // Shop handlers
   const handleOpenShop = useCallback(() => {
-    console.log('Shop - Coming soon!');
+    setShowShop(true);
   }, []);
 
-  const handleOpenSkins = useCallback(() => {
-    console.log('Skins - Coming soon!');
+  const handleCloseShop = useCallback(() => {
+    setShowShop(false);
   }, []);
+
+  const handlePurchaseCoins = useCallback((amount) => {
+    // In production, this would be after successful IAP
+    addCoins(amount);
+  }, [addCoins]);
+
+  const handleBuyPowerUp = useCallback((powerUp) => {
+    buyPowerUp(powerUp);
+  }, [buyPowerUp]);
+
+  const handleRemoveAds = useCallback(() => {
+    // In production, this would be after successful IAP
+    removeAds();
+  }, [removeAds]);
+
+  // Skins handlers
+  const handleOpenSkins = useCallback(() => {
+    setShowSkins(true);
+  }, []);
+
+  const handleCloseSkins = useCallback(() => {
+    setShowSkins(false);
+  }, []);
+
+  const handleSelectSkin = useCallback((skin) => {
+    selectSkin(skin);
+  }, [selectSkin]);
+
+  const handleUnlockSkin = useCallback((skin) => {
+    unlockSkin(skin);
+  }, [unlockSkin]);
 
   return (
     <View style={styles.container}>
@@ -145,6 +189,7 @@ const FlappyFishGame = () => {
         onScore={handleScore}
         onCoin={handleCoin}
         onFlap={handleFlap}
+        selectedSkin={selectedSkin}
       />
 
       {/* Game UI - Score, Pause button */}
@@ -169,6 +214,7 @@ const FlappyFishGame = () => {
           coins={coins}
           isMuted={isMuted}
           onToggleMute={handleToggleMute}
+          selectedSkin={selectedSkin}
         />
       )}
 
@@ -188,6 +234,28 @@ const FlappyFishGame = () => {
 
       {/* Banner Ad - Managed by AdsContext */}
       <BannerAdComponent />
+
+      {/* Shop Modal */}
+      <ShopModal
+        visible={showShop}
+        onClose={handleCloseShop}
+        coins={coins}
+        onPurchaseCoins={handlePurchaseCoins}
+        onBuyPowerUp={handleBuyPowerUp}
+        onRemoveAds={handleRemoveAds}
+        adsRemoved={adsRemoved}
+      />
+
+      {/* Skins Modal */}
+      <SkinsModal
+        visible={showSkins}
+        onClose={handleCloseSkins}
+        coins={coins}
+        selectedSkin={selectedSkin}
+        unlockedSkins={unlockedSkins}
+        onSelectSkin={handleSelectSkin}
+        onUnlockSkin={handleUnlockSkin}
+      />
     </View>
   );
 };
