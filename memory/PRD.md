@@ -93,9 +93,8 @@ Located in `/app/mobile/src/constants/config.js`:
 - [x] Basic UI (start, game over, HUD)
 
 ## P1 - Upcoming Tasks
-- [ ] Add Shop modal (coin purchases)
-- [ ] Add Skins modal (fish customization)
-- [ ] Implement power-ups
+- [ ] Implement power-up effects in gameplay
+- [ ] App Open ads on launch
 
 ## Recently Completed
 - [x] Sound effects system (expo-av) - Dec 2025
