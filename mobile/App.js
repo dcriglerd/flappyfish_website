@@ -5,12 +5,13 @@ import { StyleSheet, View, Text, SafeAreaView } from 'react-native';
 import FlappyFishGame from './src/screens/FlappyFishGame';
 import { AdsProvider } from './src/context/AdsContext';
 import { GameProvider } from './src/context/GameContext';
+import { AudioProvider } from './src/context/AudioContext';
 
 export default function App() {
   const [isReady, setIsReady] = useState(false);
 
   useEffect(() => {
-    // Simple initialization for Expo Go (no native ads)
+    // Simple initialization delay for splash
     const timer = setTimeout(() => {
       setIsReady(true);
     }, 500);
@@ -28,11 +29,13 @@ export default function App() {
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar style="light" />
-      <AdsProvider>
-        <GameProvider>
-          <FlappyFishGame />
-        </GameProvider>
-      </AdsProvider>
+      <AudioProvider>
+        <AdsProvider>
+          <GameProvider>
+            <FlappyFishGame />
+          </GameProvider>
+        </AdsProvider>
+      </AudioProvider>
     </SafeAreaView>
   );
 }
