@@ -18,6 +18,7 @@ import Background from '../components/Background';
 import GameCanvas from '../components/GameCanvas';
 import ShopModal from '../components/ShopModal';
 import SkinsModal from '../components/SkinsModal';
+import PowerUpBar from '../components/PowerUpBar';
 
 const FlappyFishGame = () => {
   const [isMuted, setIsMuted] = useState(false);
@@ -31,6 +32,7 @@ const FlappyFishGame = () => {
     highScore,
     coins,
     canRevive,
+    coinMultiplier,
     startGame,
     pauseGame,
     gameOver,
@@ -43,7 +45,11 @@ const FlappyFishGame = () => {
     unlockSkin,
     selectSkin,
     // Power-ups
+    ownedPowerUps,
+    activePowerUps,
     buyPowerUp,
+    activatePowerUp,
+    hasShield,
   } = useGame();
 
   const {
@@ -128,6 +134,12 @@ const FlappyFishGame = () => {
     playFlapSound();
   }, [playFlapSound]);
 
+  // Handle shield hit (saved by shield)
+  const handleShieldHit = useCallback(() => {
+    // Could play a special sound here
+    console.log('[Game] Shield absorbed hit!');
+  }, []);
+
   // Handle pause
   const handlePause = useCallback(() => {
     pauseGame();
@@ -148,7 +160,6 @@ const FlappyFishGame = () => {
   }, []);
 
   const handlePurchaseCoins = useCallback((amount) => {
-    // In production, this would be after successful IAP
     addCoins(amount);
   }, [addCoins]);
 
@@ -157,7 +168,6 @@ const FlappyFishGame = () => {
   }, [buyPowerUp]);
 
   const handleRemoveAds = useCallback(() => {
-    // In production, this would be after successful IAP
     removeAds();
   }, [removeAds]);
 
@@ -178,6 +188,12 @@ const FlappyFishGame = () => {
     unlockSkin(skin);
   }, [unlockSkin]);
 
+  // Power-up activation during gameplay
+  const handleActivatePowerUp = useCallback((powerUpId) => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
+    activatePowerUp(powerUpId);
+  }, [activatePowerUp]);
+
   return (
     <View style={styles.container}>
       {/* Background - Always visible */}
@@ -189,6 +205,7 @@ const FlappyFishGame = () => {
         onScore={handleScore}
         onCoin={handleCoin}
         onFlap={handleFlap}
+        onShieldHit={handleShieldHit}
         selectedSkin={selectedSkin}
       />
 
@@ -198,9 +215,21 @@ const FlappyFishGame = () => {
           score={score}
           highScore={highScore}
           coins={coins}
+          coinMultiplier={coinMultiplier}
           onPause={handlePause}
           isMuted={isMuted}
           onToggleMute={handleToggleMute}
+          hasShield={hasShield}
+          activePowerUps={activePowerUps}
+        />
+      )}
+
+      {/* Power-up bar during gameplay */}
+      {gameState === 'playing' && (
+        <PowerUpBar
+          ownedPowerUps={ownedPowerUps}
+          activePowerUps={activePowerUps}
+          onActivatePowerUp={handleActivatePowerUp}
         />
       )}
 
