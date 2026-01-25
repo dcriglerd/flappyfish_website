@@ -359,7 +359,6 @@ export const AdsProvider = ({ children }) => {
     showInterstitial,
     showRewardedAd,
     showAppOpenAd,
-    removeAds,
     hideBanner,
     showBannerAd,
     setGameplayActive,
