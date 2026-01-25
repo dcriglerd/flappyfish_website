@@ -59,23 +59,25 @@ export default function App() {
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar style="light" />
-      <NotificationsProvider>
-        <CloudSyncProvider>
-          <PurchasesProvider>
-            <AchievementsProvider>
-              <DailyRewardsProvider>
-                <AudioProvider>
-                  <AdsProvider>
-                    <GameProvider>
-                      <FlappyFishGame />
-                    </GameProvider>
-                  </AdsProvider>
-                </AudioProvider>
-              </DailyRewardsProvider>
-            </AchievementsProvider>
-          </PurchasesProvider>
-        </CloudSyncProvider>
-      </NotificationsProvider>
+      <AuthProvider>
+        <NotificationsProvider>
+          <CloudSyncProvider>
+            <PurchasesProvider>
+              <AchievementsProvider>
+                <DailyRewardsProvider>
+                  <AudioProvider>
+                    <AdsProvider>
+                      <GameProvider>
+                        <FlappyFishGame />
+                      </GameProvider>
+                    </AdsProvider>
+                  </AudioProvider>
+                </DailyRewardsProvider>
+              </AchievementsProvider>
+            </PurchasesProvider>
+          </CloudSyncProvider>
+        </NotificationsProvider>
+      </AuthProvider>
     </SafeAreaView>
   );
 }
