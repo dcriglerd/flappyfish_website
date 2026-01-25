@@ -11,7 +11,20 @@ import { COLORS } from '../constants/config';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
-const StartScreen = ({ onStart, onOpenShop, onOpenSkins, highScore, coins, isMuted, onToggleMute }) => {
+const StartScreen = ({ 
+  onStart, 
+  onOpenShop, 
+  onOpenSkins, 
+  onOpenLeaderboard,
+  highScore, 
+  coins, 
+  isMuted, 
+  onToggleMute,
+  selectedSkin,
+}) => {
+  const skinColor = selectedSkin?.color || COLORS.GOLD;
+  const isRainbow = skinColor === 'rainbow';
+
   return (
     <View style={styles.container}>
       {/* Sound toggle in corner */}
@@ -23,12 +36,16 @@ const StartScreen = ({ onStart, onOpenShop, onOpenSkins, highScore, coins, isMut
 
       {/* Title with Fish */}
       <View style={styles.titleContainer}>
-        {/* Animated Fish SVG */}
+        {/* Fish SVG */}
         <View style={styles.fishContainer}>
           <Svg width={60} height={45} viewBox="0 0 80 60">
-            <Ellipse cx="40" cy="30" rx="28" ry="20" fill={COLORS.GOLD} stroke="#CC9900" strokeWidth="3" />
-            <Polygon points="12,30 -8,12 -8,48" fill="#FFA500" stroke="#CC7700" strokeWidth="2" />
-            <Polygon points="35,10 45,-5 55,10" fill="#FFA500" stroke="#CC7700" strokeWidth="2" />
+            <Ellipse 
+              cx="40" cy="30" rx="28" ry="20" 
+              fill={isRainbow ? '#FFD700' : skinColor} 
+              stroke="#CC9900" strokeWidth="3" 
+            />
+            <Polygon points="12,30 -8,12 -8,48" fill={isRainbow ? '#FFA500' : skinColor} stroke="#CC7700" strokeWidth="2" />
+            <Polygon points="35,10 45,-5 55,10" fill={isRainbow ? '#FFA500' : skinColor} stroke="#CC7700" strokeWidth="2" />
             <Ellipse cx="48" cy="38" rx="16" ry="9" fill="rgba(255,255,255,0.4)" />
             <Circle cx="55" cy="25" r="10" fill="white" stroke="#333" strokeWidth="2" />
             <Circle cx="58" cy="25" r="5" fill="black" />
@@ -60,7 +77,7 @@ const StartScreen = ({ onStart, onOpenShop, onOpenSkins, highScore, coins, isMut
           <Text style={styles.startButtonText}>▶ START</Text>
         </TouchableOpacity>
 
-        <View style={styles.bottomButtons}>
+        <View style={styles.middleButtons}>
           <TouchableOpacity style={styles.shopButton} onPress={onOpenShop} activeOpacity={0.8}>
             <Text style={styles.buttonText}>🛍 Shop</Text>
           </TouchableOpacity>
@@ -68,6 +85,15 @@ const StartScreen = ({ onStart, onOpenShop, onOpenSkins, highScore, coins, isMut
             <Text style={styles.buttonText}>✨ Skins</Text>
           </TouchableOpacity>
         </View>
+
+        {/* Leaderboard Button */}
+        <TouchableOpacity 
+          style={styles.leaderboardButton} 
+          onPress={onOpenLeaderboard} 
+          activeOpacity={0.8}
+        >
+          <Text style={styles.leaderboardButtonText}>🏆 Leaderboard</Text>
+        </TouchableOpacity>
       </View>
 
       {/* Instruction */}
@@ -128,7 +154,7 @@ const styles = StyleSheet.create({
   },
   statsContainer: {
     flexDirection: 'row',
-    marginBottom: 30,
+    marginBottom: 25,
   },
   statBox: {
     backgroundColor: 'rgba(255,255,255,0.2)',
@@ -159,7 +185,7 @@ const styles = StyleSheet.create({
     paddingVertical: 18,
     borderRadius: 15,
     alignItems: 'center',
-    marginBottom: 15,
+    marginBottom: 12,
     borderWidth: 4,
     borderColor: '#c44d1a',
     shadowColor: '#000',
@@ -173,9 +199,10 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: '900',
   },
-  bottomButtons: {
+  middleButtons: {
     flexDirection: 'row',
     justifyContent: 'space-between',
+    marginBottom: 12,
   },
   shopButton: {
     flex: 1,
@@ -202,10 +229,23 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '700',
   },
+  leaderboardButton: {
+    backgroundColor: '#1e3a5f',
+    paddingVertical: 14,
+    borderRadius: 12,
+    alignItems: 'center',
+    borderWidth: 3,
+    borderColor: COLORS.GOLD,
+  },
+  leaderboardButtonText: {
+    color: COLORS.GOLD,
+    fontSize: 16,
+    fontWeight: '700',
+  },
   instruction: {
     color: 'rgba(255,255,255,0.8)',
     fontSize: 16,
-    marginTop: 30,
+    marginTop: 25,
   },
   floor: {
     position: 'absolute',
