@@ -61,6 +61,7 @@ Build a "Flappy Bird" clone named "Flappy Fish" with:
 │   │   ├── AchievementsModal.js # Achievement tracking
 │   │   ├── AchievementUnlockNotification.js # Unlock popup
 │   │   ├── DailyRewardsModal.js # Streaks & challenges
+│   │   ├── UsernameModal.js  # Profile editing
 │   │   └── PowerUpBar.js     # Active power-ups
 │   ├── context/
 │   │   ├── AuthContext.js    # User authentication & profile
