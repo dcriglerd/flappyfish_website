@@ -249,9 +249,23 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     borderWidth: 3,
     borderColor: COLORS.GOLD,
+    marginBottom: 10,
   },
   leaderboardButtonText: {
     color: COLORS.GOLD,
+    fontSize: 16,
+    fontWeight: '700',
+  },
+  achievementsButton: {
+    backgroundColor: '#1a1a2e',
+    paddingVertical: 14,
+    borderRadius: 12,
+    alignItems: 'center',
+    borderWidth: 3,
+    borderColor: '#e67e22',
+  },
+  achievementsButtonText: {
+    color: '#e67e22',
     fontSize: 16,
     fontWeight: '700',
   },
