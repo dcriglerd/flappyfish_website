@@ -215,6 +215,9 @@ const DailyRewardsModal = ({ visible, onClose, onClaimCoins }) => {
                 <Text style={styles.streakTip}>
                   💡 Play every day to build your streak and earn bigger rewards!
                 </Text>
+
+                {/* Notification Settings */}
+                <NotificationSettings compact />
               </View>
             ) : (
               <View style={styles.challengesContent}>
