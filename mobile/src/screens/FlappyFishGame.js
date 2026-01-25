@@ -210,8 +210,10 @@ const FlappyFishGame = () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
     coinsCollectedInGame.current = 0;
     usedPowerUpInGame.current = false;
+    // Cancel streak warning since player is playing
+    cancelStreakWarning();
     startGame();
-  }, [startGame]);
+  }, [startGame, cancelStreakWarning]);
 
   // Handle game over
   const handleGameOver = useCallback(() => {
