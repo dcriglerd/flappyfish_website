@@ -243,12 +243,27 @@ Located in `/app/mobile/src/constants/config.js`:
   - Uses expo-notifications for scheduling
   - Android notification channels configured
 
+- [x] User Authentication & Profile - Jan 2025
+  - **AuthContext**: Centralized authentication state management
+  - **Device-based User ID**: 
+    - iOS: Uses `identifierForVendor` (persists until app reinstall)
+    - Android: Uses `androidId` (persists across reinstalls)
+    - Fallback: Generated UUID stored in AsyncStorage
+  - **Username System**:
+    - Players can set custom username (3-20 chars, alphanumeric + underscore)
+    - Username displayed on leaderboard instead of user ID
+    - UsernameModal for editing profile
+    - Profile button on start screen
+  - **Cloud Integration**:
+    - Username synced with backend on save
+    - Leaderboard shows username if set, otherwise formatted ID
+  - Backend updated to support username field
+
 ## P1 - Upcoming Tasks
-- [ ] User Authentication - Replace device-based user ID with proper auth
-- [ ] Finalize IAP with Production Keys
+- [ ] Finalize IAP with Production Keys (RevenueCat)
 
 ## P2 - Future Tasks
-- [ ] User Profile/Username for leaderboard
+- [ ] Social login (Google, Apple)
 - [ ] Social features (friends, sharing)
 
 ## Recently Completed - Google AdMob Integration (Dec 2025)
