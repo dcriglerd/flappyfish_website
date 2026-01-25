@@ -288,6 +288,7 @@ export const AchievementsProvider = ({ children }) => {
     stats,
     newlyUnlocked,
     isLoaded,
+    canShowNotifications,
     
     // Actions
     updateStats,
@@ -296,6 +297,9 @@ export const AchievementsProvider = ({ children }) => {
     dismissNotification,
     getProgress,
     loadFromCloud,
+    enableNotifications,
+    disableNotifications,
+    clearNotificationQueue,
     
     // Helpers
     isUnlocked: (id) => unlockedAchievements.includes(id),
