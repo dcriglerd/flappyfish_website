@@ -22,7 +22,6 @@
     "react": "19.1.0",
     "react-native": "0.81.5",
     "react-native-google-mobile-ads": "^16.0.1",
-    "react-native-purchases": "^9.7.1",
     "react-native-svg": "^15.15.1",
     "react-native-svg-transformer": "^1.5.2"
   },
