@@ -208,6 +208,22 @@ Located in `/app/mobile/src/constants/config.js`:
   - Backend API supports achievement_stats and unlocked_achievements fields
   - Intelligent data merging (keeps higher values, combines unlocks)
 
+- [x] Daily Rewards System - Jan 2025
+  - **Daily Streak:**
+    - Track consecutive days played
+    - Escalating rewards (Day 1: 10 coins → Day 7: 150 coins + bonus)
+    - Streak counter on start screen with glow effect
+    - Weekly cycle with multiplier for long streaks
+  - **Daily Challenges:**
+    - 3 random challenges daily (easy/medium/hard)
+    - Challenge types: score, coins, games played, power-ups, special
+    - Progress bars with real-time tracking
+    - Bonus reward (+50 coins) for completing all 3
+  - Countdown timer shows time until daily reset (UTC midnight)
+  - DailyRewardsContext for state management
+  - DailyRewardsModal with tabbed UI (Streak / Challenges)
+  - Persisted to AsyncStorage with daily refresh logic
+
 ## P1 - Upcoming Tasks
 - [ ] User Authentication - Replace device-based user ID with proper auth
 - [ ] Finalize IAP with Production Keys
