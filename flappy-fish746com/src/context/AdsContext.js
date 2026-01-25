@@ -285,12 +285,19 @@ export const AdsProvider = ({ children }) => {
     if (!adsRemoved) setShowBanner(true);
   }, [adsRemoved]);
 
+  // Set gameplay state - call this when game starts/ends
+  const setGameplayActive = useCallback((isActive) => {
+    setIsGamePlaying(isActive);
+    console.log('[AdsManager] Gameplay active:', isActive);
+  }, []);
+
   const value = {
     showBanner: showBanner && !adsRemoved,
     adsRemoved,
     isInterstitialLoaded,
     isRewardedLoaded,
     isAppOpenLoaded,
+    isGamePlaying,
     onGameOver,
     showInterstitial,
     showRewardedAd,
@@ -298,6 +305,7 @@ export const AdsProvider = ({ children }) => {
     removeAds,
     hideBanner,
     showBannerAd,
+    setGameplayActive,
     bannerAdUnitId: getAdUnitId('BANNER'),
   };
 
