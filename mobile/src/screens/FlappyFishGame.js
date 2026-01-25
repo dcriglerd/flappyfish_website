@@ -8,6 +8,7 @@ import * as Haptics from 'expo-haptics';
 import { useGame } from '../context/GameContext';
 import { useAds } from '../context/AdsContext';
 import { useAudio } from '../context/AudioContext';
+import { useCloudSync } from '../context/CloudSyncContext';
 import { COLORS } from '../constants/config';
 
 import StartScreen from '../components/StartScreen';
@@ -19,11 +20,13 @@ import GameCanvas from '../components/GameCanvas';
 import ShopModal from '../components/ShopModal';
 import SkinsModal from '../components/SkinsModal';
 import PowerUpBar from '../components/PowerUpBar';
+import LeaderboardModal from '../components/LeaderboardModal';
 
 const FlappyFishGame = () => {
   const [isMuted, setIsMuted] = useState(false);
   const [showShop, setShowShop] = useState(false);
   const [showSkins, setShowSkins] = useState(false);
+  const [showLeaderboard, setShowLeaderboard] = useState(false);
   
   const {
     gameState,
@@ -69,6 +72,8 @@ const FlappyFishGame = () => {
     setMuted,
   } = useAudio();
 
+  const { syncToCloud } = useCloudSync();
+
   // Sync mute state with audio hook
   useEffect(() => {
     setMuted(isMuted);
@@ -82,6 +87,21 @@ const FlappyFishGame = () => {
       showBannerAd();
     }
   }, [gameState, hideBanner, showBannerAd]);
+
+  // Sync to cloud on game over
+  useEffect(() => {
+    if (gameState === 'gameover') {
+      // Sync game data to cloud
+      syncToCloud({
+        highScore,
+        coins,
+        unlockedSkins,
+        selectedSkin,
+        ownedPowerUps,
+        adsRemoved,
+      });
+    }
+  }, [gameState, highScore, coins, unlockedSkins, selectedSkin, ownedPowerUps, adsRemoved, syncToCloud]);
 
   // Handle game start
   const handleStart = useCallback(() => {
@@ -136,7 +156,6 @@ const FlappyFishGame = () => {
 
   // Handle shield hit (saved by shield)
   const handleShieldHit = useCallback(() => {
-    // Could play a special sound here
     console.log('[Game] Shield absorbed hit!');
   }, []);
 
@@ -187,6 +206,15 @@ const FlappyFishGame = () => {
   const handleUnlockSkin = useCallback((skin) => {
     unlockSkin(skin);
   }, [unlockSkin]);
+
+  // Leaderboard handlers
+  const handleOpenLeaderboard = useCallback(() => {
+    setShowLeaderboard(true);
+  }, []);
+
+  const handleCloseLeaderboard = useCallback(() => {
+    setShowLeaderboard(false);
+  }, []);
 
   // Power-up activation during gameplay
   const handleActivatePowerUp = useCallback((powerUpId) => {
@@ -239,6 +267,7 @@ const FlappyFishGame = () => {
           onStart={handleStart}
           onOpenShop={handleOpenShop}
           onOpenSkins={handleOpenSkins}
+          onOpenLeaderboard={handleOpenLeaderboard}
           highScore={highScore}
           coins={coins}
           isMuted={isMuted}
@@ -284,6 +313,13 @@ const FlappyFishGame = () => {
         unlockedSkins={unlockedSkins}
         onSelectSkin={handleSelectSkin}
         onUnlockSkin={handleUnlockSkin}
+      />
+
+      {/* Leaderboard Modal */}
+      <LeaderboardModal
+        visible={showLeaderboard}
+        onClose={handleCloseLeaderboard}
+        currentHighScore={highScore}
       />
     </View>
   );
