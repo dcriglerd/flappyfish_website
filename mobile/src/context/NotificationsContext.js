@@ -390,7 +390,7 @@ export const NotificationsProvider = ({ children }) => {
     getScheduledNotifications,
     
     // Permission
-    requestPermission: registerForPushNotifications,
+    requestPermission,
   };
 
   return (
