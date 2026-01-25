@@ -146,7 +146,7 @@ const FlappyFishGame = () => {
         skinsUnlocked: unlockedSkins.length,
       });
 
-      // Sync game data to cloud
+      // Sync game data to cloud (including achievements)
       syncToCloud({
         highScore,
         coins,
@@ -154,6 +154,10 @@ const FlappyFishGame = () => {
         selectedSkin,
         ownedPowerUps,
         adsRemoved,
+        totalGamesPlayed: achievementStats.gamesPlayed,
+        totalCoinsEarned: achievementStats.totalCoinsEarned,
+        unlockedAchievements,
+        achievementStats,
       });
     }
   }, [gameState]);
