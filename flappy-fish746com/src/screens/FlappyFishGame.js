@@ -471,17 +471,6 @@ const FlappyFishGame = () => {
       {/* Banner Ad - Managed by AdsContext */}
       <BannerAdComponent />
 
-      {/* Shop Modal */}
-      <ShopModal
-        visible={showShop}
-        onClose={handleCloseShop}
-        coins={coins}
-        onPurchaseCoins={handlePurchaseCoins}
-        onBuyPowerUp={handleBuyPowerUp}
-        onRemoveAds={handleRemoveAds}
-        adsRemoved={adsRemoved}
-      />
-
       {/* Skins Modal */}
       <SkinsModal
         visible={showSkins}
