@@ -171,13 +171,15 @@ const FlappyFishGame = () => {
     if (gameState === 'playing') {
       hideBanner();
       setGameplayActive(true); // Tell ads system game is active
+      disableAchievementNotifications(); // Don't show achievement popups during gameplay
       coinsCollectedInGame.current = 0; // Reset coins counter
       usedPowerUpInGame.current = false; // Reset power-up tracker
     } else {
       showBannerAd();
       setGameplayActive(false); // Game is not active, ads can show
+      enableAchievementNotifications(); // Show any queued achievement notifications
     }
-  }, [gameState, hideBanner, showBannerAd, setGameplayActive]);
+  }, [gameState, hideBanner, showBannerAd, setGameplayActive, enableAchievementNotifications, disableAchievementNotifications]);
 
   // Sync to cloud and check achievements on game over
   useEffect(() => {
