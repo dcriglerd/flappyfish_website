@@ -260,6 +260,25 @@ export const AdsProvider = ({ children }) => {
     }
   }, [adsRemoved]);
 
+  // Called on game start - tracks starts for interstitial frequency
+  const onGameStart = useCallback(() => {
+    if (adsRemoved) return;
+
+    gameStartCountRef.current += 1;
+    console.log(`[AdsManager] Game start count: ${gameStartCountRef.current}`);
+
+    const startFrequency = AD_CONFIG.INTERSTITIAL_START_FREQUENCY || 3;
+    
+    // Show interstitial every N game starts (but not the first game)
+    if (
+      gameStartCountRef.current > 1 &&
+      gameStartCountRef.current % startFrequency === 0
+    ) {
+      console.log('[AdsManager] Showing interstitial on game start');
+      showInterstitial();
+    }
+  }, [adsRemoved]);
+
   // Show interstitial ad
   const showInterstitial = useCallback(() => {
     if (adsRemoved) return;
