@@ -179,7 +179,8 @@ export const AdsProvider = ({ children }) => {
 
   // Show App Open ad when app comes to foreground
   useEffect(() => {
-    if (adsRemoved) return;
+    // Skip if ads removed or App Open ads are disabled
+    if (adsRemoved || AD_CONFIG.DISABLE_APP_OPEN_ADS) return;
 
     const subscription = AppState.addEventListener('change', (nextAppState) => {
       // App came to foreground
@@ -188,8 +189,9 @@ export const AdsProvider = ({ children }) => {
         nextAppState === 'active'
       ) {
         const now = Date.now();
-        // Don't show more than once every 30 seconds
-        if (now - lastAppOpenShowTime.current > 30000) {
+        const cooldown = AD_CONFIG.APP_OPEN_COOLDOWN || 120000;
+        // Don't show during gameplay or within cooldown period
+        if (!isGamePlaying && now - lastAppOpenShowTime.current > cooldown) {
           showAppOpenAd();
         }
       }
@@ -199,20 +201,13 @@ export const AdsProvider = ({ children }) => {
     return () => {
       subscription.remove();
     };
-  }, [adsRemoved]);
+  }, [adsRemoved, isGamePlaying]);
 
-  // Show App Open ad on initial launch
+  // Show App Open ad on initial launch - DISABLED to not interrupt
   useEffect(() => {
-    if (adsRemoved) return;
-    
-    // Small delay to let the ad load
-    const timer = setTimeout(() => {
-      if (isAppOpenLoaded) {
-        showAppOpenAd();
-      }
-    }, 2000);
-
-    return () => clearTimeout(timer);
+    // Disabled - don't show app open ad on launch
+    // This was interrupting the user experience
+    return;
   }, [isAppOpenLoaded, adsRemoved]);
 
   // Show App Open Ad
