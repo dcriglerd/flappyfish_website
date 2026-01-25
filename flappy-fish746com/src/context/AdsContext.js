@@ -244,41 +244,6 @@ export const AdsProvider = ({ children }) => {
     }
   }, [adsRemoved, isAppOpenLoaded]);
 
-  // Called on game over - tracks deaths for interstitial frequency
-  const onGameOver = useCallback(() => {
-    if (adsRemoved) return;
-
-    deathCountRef.current += 1;
-    console.log(`[AdsManager] Death count: ${deathCountRef.current}`);
-
-    // Show interstitial every N deaths
-    if (
-      deathCountRef.current >= AD_CONFIG.INTERSTITIAL_FREQUENCY &&
-      deathCountRef.current % AD_CONFIG.INTERSTITIAL_FREQUENCY === 0
-    ) {
-      showInterstitial();
-    }
-  }, [adsRemoved]);
-
-  // Called on game start - tracks starts for interstitial frequency
-  const onGameStart = useCallback(() => {
-    if (adsRemoved) return;
-
-    gameStartCountRef.current += 1;
-    console.log(`[AdsManager] Game start count: ${gameStartCountRef.current}`);
-
-    const startFrequency = AD_CONFIG.INTERSTITIAL_START_FREQUENCY || 3;
-    
-    // Show interstitial every N game starts (but not the first game)
-    if (
-      gameStartCountRef.current > 1 &&
-      gameStartCountRef.current % startFrequency === 0
-    ) {
-      console.log('[AdsManager] Showing interstitial on game start');
-      showInterstitial();
-    }
-  }, [adsRemoved]);
-
   // Show interstitial ad
   const showInterstitial = useCallback(() => {
     if (adsRemoved) return;
@@ -287,7 +252,58 @@ export const AdsProvider = ({ children }) => {
       console.log('[AdsManager] Showing interstitial...');
       interstitialRef.current.show();
     } else {
-      console.log('[AdsManager] Interstitial not ready');
+      console.log('[AdsManager] Interstitial not ready, loaded:', isInterstitialLoaded);
+      // Try to load for next time
+      if (interstitialRef.current) {
+        interstitialRef.current.load();
+      }
+    }
+  }, [adsRemoved, isInterstitialLoaded]);
+
+  // Called on game over - tracks deaths for interstitial frequency
+  const onGameOver = useCallback(() => {
+    if (adsRemoved) return;
+
+    deathCountRef.current += 1;
+    const currentDeathCount = deathCountRef.current;
+    console.log(`[AdsManager] Death count: ${currentDeathCount}, frequency: ${AD_CONFIG.INTERSTITIAL_FREQUENCY}`);
+
+    // Show interstitial every N deaths (starting from the Nth death)
+    if (currentDeathCount % AD_CONFIG.INTERSTITIAL_FREQUENCY === 0) {
+      console.log(`[AdsManager] Triggering interstitial on death #${currentDeathCount}`);
+      // Small delay to let game over screen appear first
+      setTimeout(() => {
+        if (isInterstitialLoaded && interstitialRef.current) {
+          console.log('[AdsManager] Showing interstitial on game over...');
+          interstitialRef.current.show();
+        } else {
+          console.log('[AdsManager] Interstitial not ready for game over');
+        }
+      }, 500);
+    }
+  }, [adsRemoved, isInterstitialLoaded]);
+
+  // Called on game start - tracks starts for interstitial frequency
+  const onGameStart = useCallback(() => {
+    if (adsRemoved) return;
+
+    gameStartCountRef.current += 1;
+    const currentStartCount = gameStartCountRef.current;
+    const startFrequency = AD_CONFIG.INTERSTITIAL_START_FREQUENCY || 3;
+    
+    console.log(`[AdsManager] Game start count: ${currentStartCount}, frequency: ${startFrequency}`);
+
+    // Show interstitial every N game starts (but not the first game)
+    // Trigger on 3rd, 6th, 9th start etc.
+    if (currentStartCount > 1 && currentStartCount % startFrequency === 0) {
+      console.log(`[AdsManager] Triggering interstitial on game start #${currentStartCount}`);
+      // Show immediately before game starts
+      if (isInterstitialLoaded && interstitialRef.current) {
+        console.log('[AdsManager] Showing interstitial on game start...');
+        interstitialRef.current.show();
+      } else {
+        console.log('[AdsManager] Interstitial not ready for game start');
+      }
     }
   }, [adsRemoved, isInterstitialLoaded]);
 
