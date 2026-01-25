@@ -48,6 +48,7 @@ export const CloudSyncProvider = ({ children }) => {
       
       const payload = {
         user_id: userId,
+        username: username || null,
         high_score: gameData.highScore || 0,
         coins: gameData.coins || 0,
         unlocked_skins: gameData.unlockedSkins || ['default'],
@@ -87,7 +88,7 @@ export const CloudSyncProvider = ({ children }) => {
     } finally {
       setIsSyncing(false);
     }
-  }, [userId, isSyncing]);
+  }, [userId, username, isSyncing]);
 
   // Fetch game data from cloud
   const fetchFromCloud = useCallback(async () => {
