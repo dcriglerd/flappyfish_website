@@ -31,6 +31,7 @@ const FlappyFishGame = () => {
   const [showSkins, setShowSkins] = useState(false);
   const [showLeaderboard, setShowLeaderboard] = useState(false);
   const [showAchievements, setShowAchievements] = useState(false);
+  const [isLoadingCloudData, setIsLoadingCloudData] = useState(true);
   
   const coinsCollectedInGame = useRef(0);
   
@@ -79,7 +80,7 @@ const FlappyFishGame = () => {
     setMuted,
   } = useAudio();
 
-  const { syncToCloud } = useCloudSync();
+  const { syncToCloud, fetchFromCloud, userId } = useCloudSync();
 
   const {
     updateStats,
@@ -87,7 +88,36 @@ const FlappyFishGame = () => {
     dismissNotification,
     getUnlockedCount,
     getTotalCount,
+    unlockedAchievements,
+    stats: achievementStats,
+    loadFromCloud: loadAchievementsFromCloud,
   } = useAchievements();
+
+  // Load cloud data on app start
+  useEffect(() => {
+    const loadCloudData = async () => {
+      if (!userId) return;
+      
+      try {
+        console.log('[Game] Loading cloud data...');
+        const result = await fetchFromCloud();
+        
+        if (result.success && result.data && !result.isNewUser) {
+          console.log('[Game] Cloud data loaded:', result.data);
+          // Load achievements from cloud
+          loadAchievementsFromCloud(result.data);
+        } else if (result.isNewUser) {
+          console.log('[Game] New user - no cloud data');
+        }
+      } catch (error) {
+        console.error('[Game] Failed to load cloud data:', error);
+      } finally {
+        setIsLoadingCloudData(false);
+      }
+    };
+    
+    loadCloudData();
+  }, [userId, fetchFromCloud, loadAchievementsFromCloud]);
 
   // Sync mute state with audio hook
   useEffect(() => {
