@@ -208,13 +208,41 @@ export const AchievementsProvider = ({ children }) => {
 
   // Dismiss the unlock notification
   const dismissNotification = useCallback(() => {
-    setNewlyUnlocked(null);
-    // Show next one if there are more
-    if (pendingRewardsRef.current.length > 1) {
-      setTimeout(() => {
-        setNewlyUnlocked(pendingRewardsRef.current[1]);
-      }, 300);
+    // Remove the shown notification from queue
+    if (queuedNotificationsRef.current.length > 0) {
+      queuedNotificationsRef.current.shift();
     }
+    setNewlyUnlocked(null);
+    
+    // Show next one if there are more and notifications are allowed
+    if (canShowNotifications && queuedNotificationsRef.current.length > 0) {
+      setTimeout(() => {
+        setNewlyUnlocked(queuedNotificationsRef.current[0]);
+      }, 500);
+    }
+  }, [canShowNotifications]);
+
+  // Enable notifications (call on game over/menu)
+  const enableNotifications = useCallback(() => {
+    setCanShowNotifications(true);
+    // Show first queued notification if any
+    if (queuedNotificationsRef.current.length > 0) {
+      setTimeout(() => {
+        setNewlyUnlocked(queuedNotificationsRef.current[0]);
+      }, 500);
+    }
+  }, []);
+
+  // Disable notifications (call when game starts)
+  const disableNotifications = useCallback(() => {
+    setCanShowNotifications(false);
+    setNewlyUnlocked(null); // Hide any current notification
+  }, []);
+
+  // Clear all queued notifications
+  const clearNotificationQueue = useCallback(() => {
+    queuedNotificationsRef.current = [];
+    setNewlyUnlocked(null);
   }, []);
 
   // Get progress for an achievement
