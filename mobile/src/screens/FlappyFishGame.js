@@ -160,6 +160,14 @@ const FlappyFishGame = () => {
         skinsUnlocked: unlockedSkins.length,
       });
 
+      // Update daily challenge progress
+      updateChallengeProgress({
+        score: score,
+        coinsCollected: coinsCollectedInGame.current,
+        usedPowerUp: usedPowerUpInGame.current,
+        gamesPlayed: 1,
+      });
+
       // Sync game data to cloud (including achievements)
       syncToCloud({
         highScore,
@@ -180,6 +188,7 @@ const FlappyFishGame = () => {
   const handleStart = useCallback(() => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
     coinsCollectedInGame.current = 0;
+    usedPowerUpInGame.current = false;
     startGame();
   }, [startGame]);
 
@@ -195,6 +204,7 @@ const FlappyFishGame = () => {
   const handleRetry = useCallback(() => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
     coinsCollectedInGame.current = 0;
+    usedPowerUpInGame.current = false;
     startGame();
   }, [startGame]);
 
