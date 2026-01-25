@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState, useRef } from 'react';
 import {
   View,
   StyleSheet,
@@ -9,6 +9,7 @@ import { useGame } from '../context/GameContext';
 import { useAds } from '../context/AdsContext';
 import { useAudio } from '../context/AudioContext';
 import { useCloudSync } from '../context/CloudSyncContext';
+import { useAchievements } from '../context/AchievementsContext';
 import { COLORS } from '../constants/config';
 
 import StartScreen from '../components/StartScreen';
@@ -21,12 +22,17 @@ import ShopModal from '../components/ShopModal';
 import SkinsModal from '../components/SkinsModal';
 import PowerUpBar from '../components/PowerUpBar';
 import LeaderboardModal from '../components/LeaderboardModal';
+import AchievementsModal from '../components/AchievementsModal';
+import AchievementUnlockNotification from '../components/AchievementUnlockNotification';
 
 const FlappyFishGame = () => {
   const [isMuted, setIsMuted] = useState(false);
   const [showShop, setShowShop] = useState(false);
   const [showSkins, setShowSkins] = useState(false);
   const [showLeaderboard, setShowLeaderboard] = useState(false);
+  const [showAchievements, setShowAchievements] = useState(false);
+  
+  const coinsCollectedInGame = useRef(0);
   
   const {
     gameState,
@@ -53,6 +59,7 @@ const FlappyFishGame = () => {
     buyPowerUp,
     activatePowerUp,
     hasShield,
+    consumeShield,
   } = useGame();
 
   const {
@@ -74,6 +81,14 @@ const FlappyFishGame = () => {
 
   const { syncToCloud } = useCloudSync();
 
+  const {
+    updateStats,
+    newlyUnlocked,
+    dismissNotification,
+    getUnlockedCount,
+    getTotalCount,
+  } = useAchievements();
+
   // Sync mute state with audio hook
   useEffect(() => {
     setMuted(isMuted);
@@ -83,14 +98,24 @@ const FlappyFishGame = () => {
   useEffect(() => {
     if (gameState === 'playing') {
       hideBanner();
+      coinsCollectedInGame.current = 0; // Reset coins counter
     } else {
       showBannerAd();
     }
   }, [gameState, hideBanner, showBannerAd]);
 
-  // Sync to cloud on game over
+  // Sync to cloud and check achievements on game over
   useEffect(() => {
     if (gameState === 'gameover') {
+      // Update achievement stats
+      updateStats({
+        gameCompleted: true,
+        score: score,
+        coinsEarned: coinsCollectedInGame.current,
+        coinsInGame: coinsCollectedInGame.current,
+        skinsUnlocked: unlockedSkins.length,
+      });
+
       // Sync game data to cloud
       syncToCloud({
         highScore,
@@ -101,11 +126,12 @@ const FlappyFishGame = () => {
         adsRemoved,
       });
     }
-  }, [gameState, highScore, coins, unlockedSkins, selectedSkin, ownedPowerUps, adsRemoved, syncToCloud]);
+  }, [gameState]);
 
   // Handle game start
   const handleStart = useCallback(() => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+    coinsCollectedInGame.current = 0;
     startGame();
   }, [startGame]);
 
@@ -120,6 +146,7 @@ const FlappyFishGame = () => {
   // Handle retry
   const handleRetry = useCallback(() => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+    coinsCollectedInGame.current = 0;
     startGame();
   }, [startGame]);
 
@@ -146,6 +173,7 @@ const FlappyFishGame = () => {
   const handleCoin = useCallback(() => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     playCoinSound();
+    coinsCollectedInGame.current += 1;
     addCoins(1);
   }, [addCoins, playCoinSound]);
 
@@ -157,7 +185,9 @@ const FlappyFishGame = () => {
   // Handle shield hit (saved by shield)
   const handleShieldHit = useCallback(() => {
     console.log('[Game] Shield absorbed hit!');
-  }, []);
+    // Update achievement stats for shield usage
+    updateStats({ shieldUsed: true });
+  }, [updateStats]);
 
   // Handle pause
   const handlePause = useCallback(() => {
@@ -205,7 +235,9 @@ const FlappyFishGame = () => {
 
   const handleUnlockSkin = useCallback((skin) => {
     unlockSkin(skin);
-  }, [unlockSkin]);
+    // Update achievement stats
+    updateStats({ skinsUnlocked: unlockedSkins.length + 1 });
+  }, [unlockSkin, unlockedSkins.length, updateStats]);
 
   // Leaderboard handlers
   const handleOpenLeaderboard = useCallback(() => {
@@ -216,11 +248,28 @@ const FlappyFishGame = () => {
     setShowLeaderboard(false);
   }, []);
 
+  // Achievements handlers
+  const handleOpenAchievements = useCallback(() => {
+    setShowAchievements(true);
+  }, []);
+
+  const handleCloseAchievements = useCallback(() => {
+    setShowAchievements(false);
+  }, []);
+
+  // Handle achievement claim
+  const handleClaimAchievement = useCallback((achievement) => {
+    addCoins(achievement.reward);
+    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+  }, [addCoins]);
+
   // Power-up activation during gameplay
   const handleActivatePowerUp = useCallback((powerUpId) => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
     activatePowerUp(powerUpId);
-  }, [activatePowerUp]);
+    // Update achievement stats
+    updateStats({ powerupUsed: true });
+  }, [activatePowerUp, updateStats]);
 
   return (
     <View style={styles.container}>
@@ -268,11 +317,13 @@ const FlappyFishGame = () => {
           onOpenShop={handleOpenShop}
           onOpenSkins={handleOpenSkins}
           onOpenLeaderboard={handleOpenLeaderboard}
+          onOpenAchievements={handleOpenAchievements}
           highScore={highScore}
           coins={coins}
           isMuted={isMuted}
           onToggleMute={handleToggleMute}
           selectedSkin={selectedSkin}
+          achievementProgress={`${getUnlockedCount()}/${getTotalCount()}`}
         />
       )}
 
@@ -289,6 +340,13 @@ const FlappyFishGame = () => {
           onHome={handleHome}
         />
       )}
+
+      {/* Achievement Unlock Notification */}
+      <AchievementUnlockNotification
+        achievement={newlyUnlocked}
+        onDismiss={dismissNotification}
+        onClaim={handleClaimAchievement}
+      />
 
       {/* Banner Ad - Managed by AdsContext */}
       <BannerAdComponent />
@@ -320,6 +378,12 @@ const FlappyFishGame = () => {
         visible={showLeaderboard}
         onClose={handleCloseLeaderboard}
         currentHighScore={highScore}
+      />
+
+      {/* Achievements Modal */}
+      <AchievementsModal
+        visible={showAchievements}
+        onClose={handleCloseAchievements}
       />
     </View>
   );
