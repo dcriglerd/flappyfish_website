@@ -153,6 +153,10 @@ async def sync_game_data(data: GameDataCreate):
             "updated_at": now,
         }
         
+        # Update username if provided
+        if data.username:
+            update_data["username"] = data.username
+        
         await db.game_data.update_one(
             {"user_id": data.user_id},
             {"$set": update_data}
