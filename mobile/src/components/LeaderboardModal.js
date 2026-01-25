@@ -85,11 +85,8 @@ const LeaderboardModal = ({ visible, onClose, currentHighScore }) => {
         </View>
         <View style={styles.playerInfo}>
           <Text style={[styles.playerName, isCurrentUser && styles.currentUserText]}>
-            {isCurrentUser ? '👤 You' : `Player ${item.user_id.slice(-6)}`}
+            {isCurrentUser ? '👤 You' : (item.username || `Player${item.user_id.slice(-6).toUpperCase()}`)}
           </Text>
-          {item.username && (
-            <Text style={styles.username}>@{item.username}</Text>
-          )}
         </View>
         <View style={styles.scoreContainer}>
           <Text style={[styles.scoreText, isCurrentUser && styles.currentUserText]}>
