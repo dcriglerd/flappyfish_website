@@ -35,8 +35,14 @@ export const AD_CONFIG = {
     },
   },
 
-  // Interstitial frequency (show every N game overs)
-  INTERSTITIAL_FREQUENCY: 3,
+  // Interstitial frequency (show every N game overs) - increased to reduce interruptions
+  INTERSTITIAL_FREQUENCY: 5,
+  
+  // App Open ad cooldown in milliseconds (2 minutes)
+  APP_OPEN_COOLDOWN: 120000,
+  
+  // Disable App Open ads completely (set to true to disable)
+  DISABLE_APP_OPEN_ADS: true,
 };
 
 // Game Configuration
