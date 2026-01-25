@@ -16,11 +16,13 @@ const StartScreen = ({
   onOpenShop, 
   onOpenSkins, 
   onOpenLeaderboard,
+  onOpenAchievements,
   highScore, 
   coins, 
   isMuted, 
   onToggleMute,
   selectedSkin,
+  achievementProgress,
 }) => {
   const skinColor = selectedSkin?.color || COLORS.GOLD;
   const isRainbow = skinColor === 'rainbow';
