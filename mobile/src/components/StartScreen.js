@@ -18,6 +18,7 @@ const StartScreen = ({
   onOpenLeaderboard,
   onOpenAchievements,
   onOpenDailyRewards,
+  onOpenProfile,
   highScore, 
   coins, 
   isMuted, 
@@ -26,6 +27,7 @@ const StartScreen = ({
   achievementProgress,
   currentStreak,
   hasUnclaimedStreak,
+  displayName,
 }) => {
   const skinColor = selectedSkin?.color || COLORS.GOLD;
   const isRainbow = skinColor === 'rainbow';
