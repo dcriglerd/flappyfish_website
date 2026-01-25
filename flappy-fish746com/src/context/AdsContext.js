@@ -324,13 +324,13 @@ export const AdsProvider = ({ children }) => {
     return false;
   }, [isRewardedLoaded, adsRemoved]);
 
-  // Remove ads (purchased)
-  const removeAds = useCallback(async () => {
-    setAdsRemoved(true);
-    setShowBanner(false);
-    await AsyncStorage.setItem('flappyfish_ads_removed', 'true');
-    console.log('[AdsManager] Ads removed - Premium user');
-  }, []);
+  // Remove ads (for future use if needed - currently unused)
+  // const removeAds = useCallback(async () => {
+  //   setAdsRemoved(true);
+  //   setShowBanner(false);
+  //   await AsyncStorage.setItem('flappyfish_ads_removed', 'true');
+  //   console.log('[AdsManager] Ads removed - Premium user');
+  // }, []);
 
   // Hide/show banner
   const hideBanner = useCallback(() => {
