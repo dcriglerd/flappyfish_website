@@ -100,6 +100,8 @@ const FlappyFishGame = () => {
     unlockedAchievements,
     stats: achievementStats,
     loadFromCloud: loadAchievementsFromCloud,
+    enableNotifications: enableAchievementNotifications,
+    disableNotifications: disableAchievementNotifications,
   } = useAchievements();
 
   const {
