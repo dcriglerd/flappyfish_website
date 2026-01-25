@@ -91,6 +91,17 @@ const StartScreen = ({
           </TouchableOpacity>
         </View>
 
+        {/* Daily Rewards Button */}
+        <TouchableOpacity 
+          style={[styles.dailyRewardsButton, hasUnclaimedStreak && styles.dailyRewardsButtonGlow]} 
+          onPress={onOpenDailyRewards} 
+          activeOpacity={0.8}
+        >
+          <Text style={styles.dailyRewardsButtonText}>
+            🎁 Daily Rewards {currentStreak > 0 ? `🔥${currentStreak}` : ''} {hasUnclaimedStreak ? '!' : ''}
+          </Text>
+        </TouchableOpacity>
+
         {/* Leaderboard Button */}
         <TouchableOpacity 
           style={styles.leaderboardButton} 
