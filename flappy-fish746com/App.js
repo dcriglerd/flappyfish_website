@@ -8,7 +8,6 @@ import { AuthProvider } from './src/context/AuthContext';
 import { AdsProvider } from './src/context/AdsContext';
 import { GameProvider } from './src/context/GameContext';
 import { AudioProvider } from './src/context/AudioContext';
-import { PurchasesProvider } from './src/context/PurchasesContext';
 import { CloudSyncProvider } from './src/context/CloudSyncContext';
 import { AchievementsProvider } from './src/context/AchievementsContext';
 import { DailyRewardsProvider } from './src/context/DailyRewardsContext';
