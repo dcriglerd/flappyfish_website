@@ -96,6 +96,17 @@ const StartScreen = ({
         >
           <Text style={styles.leaderboardButtonText}>🏆 Leaderboard</Text>
         </TouchableOpacity>
+
+        {/* Achievements Button */}
+        <TouchableOpacity 
+          style={styles.achievementsButton} 
+          onPress={onOpenAchievements} 
+          activeOpacity={0.8}
+        >
+          <Text style={styles.achievementsButtonText}>
+            🏅 Achievements {achievementProgress ? `(${achievementProgress})` : ''}
+          </Text>
+        </TouchableOpacity>
       </View>
 
       {/* Instruction */}
