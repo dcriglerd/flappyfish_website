@@ -100,7 +100,7 @@ export const AdsProvider = ({ children }) => {
     };
   }, [adsRemoved]);
 
-  // Initialize Rewarded Ad
+  // Initialize Rewarded Ad with better reliability
   useEffect(() => {
     if (adsRemoved) return;
 
@@ -110,6 +110,7 @@ export const AdsProvider = ({ children }) => {
 
     const unsubscribeLoaded = rewarded.addAdEventListener(RewardedAdEventType.LOADED, () => {
       setIsRewardedLoaded(true);
+      rewardedAdRetryCount.current = 0; // Reset retry count on success
       console.log('[AdsManager] Rewarded ad loaded');
     });
 
@@ -123,24 +124,38 @@ export const AdsProvider = ({ children }) => {
 
     const unsubscribeClosed = rewarded.addAdEventListener(AdEventType.CLOSED, () => {
       setIsRewardedLoaded(false);
-      console.log('[AdsManager] Rewarded ad closed, reloading...');
-      rewarded.load();
+      console.log('[AdsManager] Rewarded ad closed, reloading immediately...');
+      // Reload immediately when closed
+      setTimeout(() => rewarded.load(), 100);
     });
 
     const unsubscribeError = rewarded.addAdEventListener(AdEventType.ERROR, (error) => {
       console.log('[AdsManager] Rewarded ad error:', error);
       setIsRewardedLoaded(false);
-      setTimeout(() => rewarded.load(), 5000);
+      rewardedAdRetryCount.current += 1;
+      // Exponential backoff with max of 30 seconds
+      const retryDelay = Math.min(1000 * Math.pow(2, rewardedAdRetryCount.current), 30000);
+      console.log(`[AdsManager] Retrying rewarded ad in ${retryDelay}ms (attempt ${rewardedAdRetryCount.current})`);
+      setTimeout(() => rewarded.load(), retryDelay);
     });
 
     rewardedRef.current = rewarded;
     rewarded.load();
+
+    // Also preload periodically to ensure ad is ready
+    const preloadInterval = setInterval(() => {
+      if (!isRewardedLoaded && rewardedRef.current) {
+        console.log('[AdsManager] Periodic rewarded ad preload check');
+        rewardedRef.current.load();
+      }
+    }, 30000); // Check every 30 seconds
 
     return () => {
       unsubscribeLoaded();
       unsubscribeEarned();
       unsubscribeClosed();
       unsubscribeError();
+      clearInterval(preloadInterval);
     };
   }, [adsRemoved]);
 
