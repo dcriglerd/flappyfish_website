@@ -163,6 +163,20 @@ Located in `/app/mobile/src/constants/config.js`:
   - Connected to backend API
   - Auto-sync on game over
 
+- [x] Achievements System - Dec 2025
+  - 17 achievements across categories:
+    - Score-based (1, 10, 25, 50, 100 points)
+    - Coins collected (100, 500, 1000 total)
+    - Games played (10, 50, 100 games)
+    - Skins unlocked (first skin, all skins)
+    - Power-ups used
+    - Special challenges
+  - AchievementsContext for state management
+  - AchievementsModal with progress bars
+  - Achievement unlock notification popup
+  - Coin rewards for completing achievements
+  - Progress tracking persisted to AsyncStorage
+
 ## P2 - Future Tasks
 - [ ] Real payment processor (Stripe/RevenueCat)
 - [ ] Backend for user data persistence
