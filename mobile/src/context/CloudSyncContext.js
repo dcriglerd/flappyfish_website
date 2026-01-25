@@ -66,6 +66,8 @@ export const CloudSyncProvider = ({ children }) => {
         ads_removed: gameData.adsRemoved || false,
         total_games_played: gameData.totalGamesPlayed || 0,
         total_coins_earned: gameData.totalCoinsEarned || 0,
+        unlocked_achievements: gameData.unlockedAchievements || [],
+        achievement_stats: gameData.achievementStats || {},
       };
       
       const response = await fetch(`${API_BASE_URL}/game/sync`, {
