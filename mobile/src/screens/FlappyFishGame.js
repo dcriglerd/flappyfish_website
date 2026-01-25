@@ -463,6 +463,13 @@ const FlappyFishGame = () => {
         visible={showAchievements}
         onClose={handleCloseAchievements}
       />
+
+      {/* Daily Rewards Modal */}
+      <DailyRewardsModal
+        visible={showDailyRewards}
+        onClose={handleCloseDailyRewards}
+        onClaimCoins={handleClaimDailyCoins}
+      />
     </View>
   );
 };
