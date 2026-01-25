@@ -154,14 +154,19 @@ export const AchievementsProvider = ({ children }) => {
       // Queue rewards
       pendingRewardsRef.current = [...pendingRewardsRef.current, ...newUnlocks];
 
-      // Show first newly unlocked achievement
-      setNewlyUnlocked(newUnlocks[0]);
+      // Queue notifications - only show when allowed (game over screen)
+      queuedNotificationsRef.current = [...queuedNotificationsRef.current, ...newUnlocks];
+      
+      // Only show notification immediately if allowed (not during gameplay)
+      if (canShowNotifications && queuedNotificationsRef.current.length > 0) {
+        setNewlyUnlocked(queuedNotificationsRef.current[0]);
+      }
 
       console.log('[Achievements] Unlocked:', newUnlocks.map(a => a.name));
     }
 
     return newUnlocks;
-  }, [unlockedAchievements, saveAchievements]);
+  }, [unlockedAchievements, saveAchievements, canShowNotifications]);
 
   // Update stats after game
   const updateStats = useCallback(async (updates) => {
