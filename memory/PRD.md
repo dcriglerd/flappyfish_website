@@ -69,7 +69,8 @@ Build a "Flappy Bird" clone named "Flappy Fish" with:
 │   │   ├── PurchasesContext.js # RevenueCat IAP
 │   │   ├── CloudSyncContext.js # Backend sync & leaderboard
 │   │   ├── AchievementsContext.js # Achievement tracking
-│   │   └── DailyRewardsContext.js # Streaks & daily challenges
+│   │   ├── DailyRewardsContext.js # Streaks & daily challenges
+│   │   └── NotificationsContext.js # Push notifications
 │   ├── data/
 │   │   ├── gameData.js       # Skins & power-ups
 │   │   ├── achievements.js   # Achievement definitions
