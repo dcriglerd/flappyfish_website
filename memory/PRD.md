@@ -63,6 +63,7 @@ Build a "Flappy Bird" clone named "Flappy Fish" with:
 │   │   ├── DailyRewardsModal.js # Streaks & challenges
 │   │   └── PowerUpBar.js     # Active power-ups
 │   ├── context/
+│   │   ├── AuthContext.js    # User authentication & profile
 │   │   ├── GameContext.js    # Game state & logic
 │   │   ├── AdsContext.js     # Google AdMob
 │   │   ├── AudioContext.js   # Sound effects
