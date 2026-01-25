@@ -4,6 +4,7 @@ import { StyleSheet, View, Text, SafeAreaView } from 'react-native';
 import mobileAds from 'react-native-google-mobile-ads';
 
 import FlappyFishGame from './src/screens/FlappyFishGame';
+import { AuthProvider } from './src/context/AuthContext';
 import { AdsProvider } from './src/context/AdsContext';
 import { GameProvider } from './src/context/GameContext';
 import { AudioProvider } from './src/context/AudioContext';
