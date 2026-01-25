@@ -252,6 +252,7 @@ export const AchievementsProvider = ({ children }) => {
     unlockedAchievements,
     stats,
     newlyUnlocked,
+    isLoaded,
     
     // Actions
     updateStats,
@@ -259,6 +260,7 @@ export const AchievementsProvider = ({ children }) => {
     claimPendingRewards,
     dismissNotification,
     getProgress,
+    loadFromCloud,
     
     // Helpers
     isUnlocked: (id) => unlockedAchievements.includes(id),
