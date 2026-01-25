@@ -355,6 +355,7 @@ export const AdsProvider = ({ children }) => {
     isAppOpenLoaded,
     isGamePlaying,
     onGameOver,
+    onGameStart,
     showInterstitial,
     showRewardedAd,
     showAppOpenAd,
