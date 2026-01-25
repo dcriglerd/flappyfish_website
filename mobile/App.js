@@ -60,13 +60,15 @@ export default function App() {
       <CloudSyncProvider>
         <PurchasesProvider>
           <AchievementsProvider>
-            <AudioProvider>
-              <AdsProvider>
-                <GameProvider>
-                  <FlappyFishGame />
-                </GameProvider>
-              </AdsProvider>
-            </AudioProvider>
+            <DailyRewardsProvider>
+              <AudioProvider>
+                <AdsProvider>
+                  <GameProvider>
+                    <FlappyFishGame />
+                  </GameProvider>
+                </AdsProvider>
+              </AudioProvider>
+            </DailyRewardsProvider>
           </AchievementsProvider>
         </PurchasesProvider>
       </CloudSyncProvider>
