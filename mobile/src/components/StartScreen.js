@@ -152,7 +152,7 @@ const styles = StyleSheet.create({
   soundButton: {
     position: 'absolute',
     top: 10,
-    right: 15,
+    left: 15,
     backgroundColor: 'rgba(0,0,0,0.3)',
     width: 44,
     height: 44,
@@ -163,6 +163,28 @@ const styles = StyleSheet.create({
   },
   soundIcon: {
     fontSize: 22,
+  },
+  profileButton: {
+    position: 'absolute',
+    top: 10,
+    right: 15,
+    backgroundColor: 'rgba(0,0,0,0.3)',
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 20,
+    zIndex: 10,
+  },
+  profileIcon: {
+    fontSize: 18,
+    marginRight: 6,
+  },
+  profileName: {
+    color: COLORS.WHITE,
+    fontSize: 13,
+    fontWeight: '600',
+    maxWidth: 80,
   },
   titleContainer: {
     flexDirection: 'row',
