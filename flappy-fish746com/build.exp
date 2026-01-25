@@ -5,7 +5,7 @@ set env(EXPO_TOKEN) "8EQB0NC8kFQljlzlRqgxIcRcJ9SvYBEmNF93AK1_"
 
 cd /app/flappy-fish746com
 
-spawn eas build --platform android --profile preview
+spawn npx eas build --platform android --profile preview
 
 expect {
     "Generate a new Android Keystore?" {
@@ -16,11 +16,11 @@ expect {
         send "y\r"
         exp_continue
     }
-    "https://expo.dev/accounts" {
-        puts "Build started successfully!"
+    -re "https://expo.dev" {
+        puts "\nBuild started successfully!"
     }
     timeout {
-        puts "Timeout waiting for build"
+        puts "Timeout"
         exit 1
     }
     eof {
@@ -28,5 +28,4 @@ expect {
     }
 }
 
-# Wait for the command to finish
 wait
