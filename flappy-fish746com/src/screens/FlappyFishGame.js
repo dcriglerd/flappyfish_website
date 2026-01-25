@@ -73,6 +73,7 @@ const FlappyFishGame = () => {
 
   const {
     onGameOver: onAdsGameOver,
+    onGameStart: onAdsGameStart,
     showRewardedAd,
     hideBanner,
     showBannerAd,
