@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useCallback } from 'react';
 import { View, Text, StyleSheet, Animated, TouchableOpacity, Dimensions } from 'react-native';
 import { COLORS } from '../constants/config';
 
@@ -7,6 +7,23 @@ const { width: SCREEN_WIDTH } = Dimensions.get('window');
 const AchievementUnlockNotification = ({ achievement, onDismiss, onClaim }) => {
   const slideAnim = useRef(new Animated.Value(-150)).current;
   const scaleAnim = useRef(new Animated.Value(0.8)).current;
+
+  const handleDismiss = useCallback(() => {
+    Animated.parallel([
+      Animated.timing(slideAnim, {
+        toValue: -150,
+        duration: 200,
+        useNativeDriver: true,
+      }),
+      Animated.timing(scaleAnim, {
+        toValue: 0.8,
+        duration: 200,
+        useNativeDriver: true,
+      }),
+    ]).start(() => {
+      onDismiss && onDismiss();
+    });
+  }, [slideAnim, scaleAnim, onDismiss]);
 
   useEffect(() => {
     if (achievement) {
@@ -33,29 +50,12 @@ const AchievementUnlockNotification = ({ achievement, onDismiss, onClaim }) => {
 
       return () => clearTimeout(timer);
     }
-  }, [achievement]);
+  }, [achievement, slideAnim, scaleAnim, handleDismiss]);
 
-  const handleDismiss = () => {
-    Animated.parallel([
-      Animated.timing(slideAnim, {
-        toValue: -150,
-        duration: 200,
-        useNativeDriver: true,
-      }),
-      Animated.timing(scaleAnim, {
-        toValue: 0.8,
-        duration: 200,
-        useNativeDriver: true,
-      }),
-    ]).start(() => {
-      onDismiss && onDismiss();
-    });
-  };
-
-  const handleClaim = () => {
+  const handleClaim = useCallback(() => {
     onClaim && onClaim(achievement);
     handleDismiss();
-  };
+  }, [onClaim, achievement, handleDismiss]);
 
   if (!achievement) return null;
 
