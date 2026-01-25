@@ -97,6 +97,13 @@ const FlappyFishGame = () => {
     loadFromCloud: loadAchievementsFromCloud,
   } = useAchievements();
 
+  const {
+    currentStreak,
+    streakClaimedToday,
+    updateChallengeProgress,
+    loadFromCloud: loadDailyRewardsFromCloud,
+  } = useDailyRewards();
+
   // Load cloud data on app start
   useEffect(() => {
     const loadCloudData = async () => {
@@ -110,6 +117,8 @@ const FlappyFishGame = () => {
           console.log('[Game] Cloud data loaded:', result.data);
           // Load achievements from cloud
           loadAchievementsFromCloud(result.data);
+          // Load daily rewards from cloud
+          loadDailyRewardsFromCloud(result.data);
         } else if (result.isNewUser) {
           console.log('[Game] New user - no cloud data');
         }
@@ -121,7 +130,7 @@ const FlappyFishGame = () => {
     };
     
     loadCloudData();
-  }, [userId, fetchFromCloud, loadAchievementsFromCloud]);
+  }, [userId, fetchFromCloud, loadAchievementsFromCloud, loadDailyRewardsFromCloud]);
 
   // Sync mute state with audio hook
   useEffect(() => {
@@ -133,6 +142,7 @@ const FlappyFishGame = () => {
     if (gameState === 'playing') {
       hideBanner();
       coinsCollectedInGame.current = 0; // Reset coins counter
+      usedPowerUpInGame.current = false; // Reset power-up tracker
     } else {
       showBannerAd();
     }
