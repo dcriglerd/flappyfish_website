@@ -46,12 +46,14 @@ export const AdsProvider = ({ children }) => {
   const [isGamePlaying, setIsGamePlaying] = useState(false); // Track if game is active
   
   const deathCountRef = useRef(0);
+  const gameStartCountRef = useRef(0); // Track game starts for interstitial
   const interstitialRef = useRef(null);
   const rewardedRef = useRef(null);
   const appOpenRef = useRef(null);
   const rewardCallbackRef = useRef(null);
   const appStateRef = useRef(AppState.currentState);
   const lastAppOpenShowTime = useRef(0);
+  const rewardedAdRetryCount = useRef(0); // Track retries for rewarded ad
 
   // Load ads removed status
   useEffect(() => {
