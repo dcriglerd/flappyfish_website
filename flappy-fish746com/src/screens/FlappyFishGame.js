@@ -430,7 +430,6 @@ const FlappyFishGame = () => {
       {gameState === 'menu' && (
         <StartScreen
           onStart={handleStart}
-          onOpenShop={handleOpenShop}
           onOpenSkins={handleOpenSkins}
           onOpenLeaderboard={handleOpenLeaderboard}
           onOpenAchievements={handleOpenAchievements}
