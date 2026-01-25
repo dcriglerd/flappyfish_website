@@ -142,6 +142,19 @@ Located in `/app/mobile/src/constants/config.js`:
   - Restore purchases functionality
   - Updated ShopModal with real IAP integration
 
+- [x] Backend API for Cloud Sync - Dec 2025
+  - FastAPI backend with MongoDB
+  - Endpoints:
+    - POST /api/game/sync - Sync game data
+    - GET /api/game/{user_id} - Get user data
+    - POST /api/game/{user_id}/coins/add - Add coins
+    - POST /api/game/{user_id}/highscore - Update high score
+    - GET /api/leaderboard - Get top players
+    - GET /api/leaderboard/{user_id}/rank - Get user rank
+    - POST /api/purchases/record - Record purchases
+    - POST /api/webhook/revenuecat - RevenueCat webhook
+  - CloudSyncContext for mobile app
+
 ## P2 - Future Tasks
 - [ ] Real payment processor (Stripe/RevenueCat)
 - [ ] Backend for user data persistence
