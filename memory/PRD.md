@@ -176,12 +176,22 @@ Located in `/app/mobile/src/constants/config.js`:
   - Achievement unlock notification popup
   - Coin rewards for completing achievements
   - Progress tracking persisted to AsyncStorage
+  - Cloud sync integration for achievements persistence
+
+- [x] Full Cloud Sync Integration - Jan 2025
+  - CloudSyncContext with auto-generated user IDs
+  - Cloud data loaded on app start
+  - Game data synced on game over (high score, coins, achievements)
+  - Backend API supports achievement_stats and unlocked_achievements fields
+  - Intelligent data merging (keeps higher values, combines unlocks)
+
+## P1 - Upcoming Tasks
+- [ ] User Authentication - Replace device-based user ID with proper auth
+- [ ] Finalize IAP with Production Keys
 
 ## P2 - Future Tasks
-- [ ] Real payment processor (Stripe/RevenueCat)
-- [ ] Backend for user data persistence
-- [ ] Leaderboards
-- [ ] Achievements system
+- [ ] User Profile/Username for leaderboard
+- [ ] Social features (friends, sharing)
 
 ## Recently Completed - Google AdMob Integration (Dec 2025)
 - [x] Added `react-native-google-mobile-ads` package
