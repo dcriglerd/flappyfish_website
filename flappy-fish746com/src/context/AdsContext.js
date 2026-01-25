@@ -272,18 +272,38 @@ export const AdsProvider = ({ children }) => {
     }
   }, [adsRemoved, isInterstitialLoaded]);
 
-  // Show rewarded ad (for revive)
+  // Show rewarded ad (for revive) - with better reliability
   const showRewardedAd = useCallback((onReward) => {
+    if (adsRemoved) {
+      // If ads removed, grant reward immediately
+      onReward && onReward({ amount: 1, type: 'revive' });
+      return true;
+    }
+
     if (isRewardedLoaded && rewardedRef.current) {
       console.log('[AdsManager] Showing rewarded ad...');
       rewardCallbackRef.current = onReward;
-      rewardedRef.current.show();
-      return true;
+      try {
+        rewardedRef.current.show();
+        return true;
+      } catch (error) {
+        console.log('[AdsManager] Error showing rewarded ad:', error);
+        // If show fails, try to reload and grant reward
+        setIsRewardedLoaded(false);
+        rewardedRef.current.load();
+        onReward && onReward({ amount: 1, type: 'revive' });
+        return false;
+      }
     }
+    
     console.log('[AdsManager] Rewarded ad not ready, granting reward anyway');
+    // Try to load for next time
+    if (rewardedRef.current) {
+      rewardedRef.current.load();
+    }
     onReward && onReward({ amount: 1, type: 'revive' });
     return false;
-  }, [isRewardedLoaded]);
+  }, [isRewardedLoaded, adsRemoved]);
 
   // Remove ads (purchased)
   const removeAds = useCallback(async () => {
