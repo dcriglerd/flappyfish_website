@@ -43,7 +43,7 @@ Build a "Flappy Bird" clone named "Flappy Fish" with:
 ### Mobile App Structure
 ```
 /app/mobile/
-├── App.js                    # Entry point
+├── App.js                    # Entry point with all context providers
 ├── src/
 │   ├── components/           # UI Components
 │   │   ├── Background.js     # Animated underwater scene
@@ -54,14 +54,37 @@ Build a "Flappy Bird" clone named "Flappy Fish" with:
 │   │   ├── GameUI.js         # HUD (score, pause)
 │   │   ├── StartScreen.js    # Main menu
 │   │   ├── GameOverScreen.js # End game modal
-│   │   └── BannerAdComponent.js
+│   │   ├── BannerAdComponent.js
+│   │   ├── ShopModal.js      # In-app purchases
+│   │   ├── SkinsModal.js     # Fish skin selection
+│   │   ├── LeaderboardModal.js # Global rankings
+│   │   ├── AchievementsModal.js # Achievement tracking
+│   │   ├── AchievementUnlockNotification.js # Unlock popup
+│   │   └── PowerUpBar.js     # Active power-ups
 │   ├── context/
-│   │   ├── GameContext.js    # Game state
-│   │   └── AdsContext.js     # Mocked ads
+│   │   ├── GameContext.js    # Game state & logic
+│   │   ├── AdsContext.js     # Google AdMob
+│   │   ├── AudioContext.js   # Sound effects
+│   │   ├── PurchasesContext.js # RevenueCat IAP
+│   │   ├── CloudSyncContext.js # Backend sync & leaderboard
+│   │   └── AchievementsContext.js # Achievement tracking
+│   ├── data/
+│   │   ├── gameData.js       # Skins & power-ups
+│   │   └── achievements.js   # Achievement definitions
 │   ├── constants/
-│   │   └── config.js         # Game config
+│   │   └── config.js         # Game config & Ad IDs
 │   └── screens/
 │       └── FlappyFishGame.js # Main screen
+```
+
+### Backend Architecture
+```
+/app/backend/
+└── server.py                 # FastAPI with MongoDB
+    ├── /api/game/sync        # Sync all game data
+    ├── /api/game/{user_id}   # Get user data
+    ├── /api/leaderboard      # Global rankings
+    └── /api/purchases        # IAP records
 ```
 
 ### Key Dependencies (Expo Go Compatible)
