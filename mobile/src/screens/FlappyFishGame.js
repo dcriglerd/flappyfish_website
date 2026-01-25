@@ -27,6 +27,7 @@ import LeaderboardModal from '../components/LeaderboardModal';
 import AchievementsModal from '../components/AchievementsModal';
 import AchievementUnlockNotification from '../components/AchievementUnlockNotification';
 import DailyRewardsModal from '../components/DailyRewardsModal';
+import UsernameModal from '../components/UsernameModal';
 
 const FlappyFishGame = () => {
   const [isMuted, setIsMuted] = useState(false);
@@ -35,6 +36,7 @@ const FlappyFishGame = () => {
   const [showLeaderboard, setShowLeaderboard] = useState(false);
   const [showAchievements, setShowAchievements] = useState(false);
   const [showDailyRewards, setShowDailyRewards] = useState(false);
+  const [showUsernameModal, setShowUsernameModal] = useState(false);
   const [isLoadingCloudData, setIsLoadingCloudData] = useState(true);
   
   const coinsCollectedInGame = useRef(0);
