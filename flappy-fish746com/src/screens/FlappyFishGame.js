@@ -225,8 +225,10 @@ const FlappyFishGame = () => {
     usedPowerUpInGame.current = false;
     // Cancel streak warning since player is playing
     cancelStreakWarning();
+    // Track game start for interstitial ads
+    onAdsGameStart();
     startGame();
-  }, [startGame, cancelStreakWarning]);
+  }, [startGame, cancelStreakWarning, onAdsGameStart]);
 
   // Handle game over
   const handleGameOver = useCallback(() => {
@@ -241,8 +243,10 @@ const FlappyFishGame = () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
     coinsCollectedInGame.current = 0;
     usedPowerUpInGame.current = false;
+    // Track game start for interstitial ads
+    onAdsGameStart();
     startGame();
-  }, [startGame]);
+  }, [startGame, onAdsGameStart]);
 
   // Handle revive with rewarded ad
   const handleRevive = useCallback(() => {
