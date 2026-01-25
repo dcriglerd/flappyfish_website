@@ -1,0 +1,32 @@
+#!/usr/bin/expect -f
+
+set timeout 300
+set env(EXPO_TOKEN) "8EQB0NC8kFQljlzlRqgxIcRcJ9SvYBEmNF93AK1_"
+
+cd /app/flappy-fish746com
+
+spawn eas build --platform android --profile preview
+
+expect {
+    "Generate a new Android Keystore?" {
+        send "y\r"
+        exp_continue
+    }
+    "Would you like to set up" {
+        send "y\r"
+        exp_continue
+    }
+    "https://expo.dev/accounts" {
+        puts "Build started successfully!"
+    }
+    timeout {
+        puts "Timeout waiting for build"
+        exit 1
+    }
+    eof {
+        puts "Build process completed"
+    }
+}
+
+# Wait for the command to finish
+wait
