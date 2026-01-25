@@ -94,8 +94,7 @@ Located in `/app/mobile/src/constants/config.js`:
 
 ## P1 - Upcoming Tasks
 - [ ] Configure RevenueCat products in dashboard
-- [ ] Connect mobile app to backend API
-- [ ] Add leaderboard UI in mobile app
+- [ ] Test full flow on physical device
 
 ## Recently Completed
 - [x] Sound effects system (expo-av) - Dec 2025
