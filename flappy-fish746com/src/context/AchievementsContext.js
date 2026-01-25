@@ -21,7 +21,9 @@ export const AchievementsProvider = ({ children }) => {
   });
   const [newlyUnlocked, setNewlyUnlocked] = useState(null); // For showing unlock notification
   const [isLoaded, setIsLoaded] = useState(false);
+  const [canShowNotifications, setCanShowNotifications] = useState(true); // Control when notifications show
   const pendingRewardsRef = useRef([]);
+  const queuedNotificationsRef = useRef([]); // Queue notifications during gameplay
 
   // Load saved data on mount
   useEffect(() => {
