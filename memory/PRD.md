@@ -211,9 +211,8 @@ eas build --platform android --profile development
 ```
 
 ## Notes
-- **MOCKED:** Ads are mocked for Expo Go compatibility
-- **MOCKED:** In-app purchases are not implemented
+- **MOCKED:** User authentication uses device-generated UUID (not proper auth)
 - Real ads require `react-native-google-mobile-ads` which needs a development build (not compatible with Expo Go)
 
 ---
-Last Updated: December 2025
+Last Updated: January 2025
