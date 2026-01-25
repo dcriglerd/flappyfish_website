@@ -25,30 +25,30 @@ export const AchievementsProvider = ({ children }) => {
 
   // Load saved data on mount
   useEffect(() => {
+    const loadSavedData = async () => {
+      try {
+        const [savedUnlocked, savedStats] = await Promise.all([
+          AsyncStorage.getItem(STORAGE_KEYS.UNLOCKED),
+          AsyncStorage.getItem(STORAGE_KEYS.STATS),
+        ]);
+
+        if (savedUnlocked) {
+          setUnlockedAchievements(JSON.parse(savedUnlocked));
+        }
+
+        if (savedStats) {
+          setStats(prev => ({ ...prev, ...JSON.parse(savedStats) }));
+        }
+        
+        setIsLoaded(true);
+      } catch (error) {
+        console.error('[Achievements] Load error:', error);
+        setIsLoaded(true);
+      }
+    };
+    
     loadSavedData();
   }, []);
-
-  const loadSavedData = async () => {
-    try {
-      const [savedUnlocked, savedStats] = await Promise.all([
-        AsyncStorage.getItem(STORAGE_KEYS.UNLOCKED),
-        AsyncStorage.getItem(STORAGE_KEYS.STATS),
-      ]);
-
-      if (savedUnlocked) {
-        setUnlockedAchievements(JSON.parse(savedUnlocked));
-      }
-
-      if (savedStats) {
-        setStats(prev => ({ ...prev, ...JSON.parse(savedStats) }));
-      }
-      
-      setIsLoaded(true);
-    } catch (error) {
-      console.error('[Achievements] Load error:', error);
-      setIsLoaded(true);
-    }
-  };
 
   // Load from cloud data (called when cloud sync fetches data)
   const loadFromCloud = useCallback(async (cloudData) => {
