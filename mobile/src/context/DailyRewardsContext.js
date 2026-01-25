@@ -147,32 +147,6 @@ export const DailyRewardsProvider = ({ children }) => {
     }
   }, [isLoaded, performDailyReset]);
 
-  const handleDailyReset = useCallback(async () => {
-    const today = getTodayDateString();
-    const seed = new Date(today).getTime();
-    const newChallenges = generateDailyChallenges(seed);
-    
-    const challenges = { date: today, challenges: newChallenges };
-    const progress = { date: today, progress: {}, completed: [], bonusClaimed: false };
-    
-    setDailyChallenges(newChallenges);
-    setChallengeProgress({});
-    setCompletedChallenges([]);
-    setAllChallengesBonusClaimed(false);
-    
-    // Update streak claimed status
-    setStreakData(prev => ({ ...prev, streakClaimedToday: false }));
-    
-    await AsyncStorage.setItem(STORAGE_KEYS.DAILY_CHALLENGES, JSON.stringify(challenges));
-    await AsyncStorage.setItem(STORAGE_KEYS.CHALLENGE_PROGRESS, JSON.stringify(progress));
-    
-    // Set up next reset timer
-    const timeUntilReset = getTimeUntilReset();
-    resetTimerRef.current = setTimeout(handleDailyReset, timeUntilReset);
-    
-    console.log('[DailyRewards] Daily reset complete');
-  }, []);
-
   // Claim daily streak reward
   const claimStreakReward = useCallback(async () => {
     if (streakData.streakClaimedToday) return { success: false, alreadyClaimed: true };
