@@ -161,40 +161,6 @@ export const CloudSyncProvider = ({ children }) => {
     }
   }, [userId]);
 
-  // Record a purchase
-  const recordPurchase = useCallback(async (purchase) => {
-    if (!userId) return { success: false };
-    
-    try {
-      const payload = {
-        user_id: userId,
-        product_id: purchase.productId,
-        transaction_id: purchase.transactionId || `local_${Date.now()}`,
-        platform: purchase.platform || 'unknown',
-        amount: purchase.amount,
-        currency: purchase.currency,
-      };
-      
-      const response = await fetch(`${API_BASE_URL}/purchases/record`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(payload),
-      });
-      
-      if (!response.ok) {
-        throw new Error(`Purchase record failed: ${response.status}`);
-      }
-      
-      const data = await response.json();
-      return { success: true, data };
-    } catch (err) {
-      console.error('[CloudSync] Purchase record error:', err);
-      return { success: false, error: err.message };
-    }
-  }, [userId]);
-
   const value = {
     userId,
     isSyncing,
@@ -207,7 +173,6 @@ export const CloudSyncProvider = ({ children }) => {
     fetchFromCloud,
     getLeaderboard,
     getUserRank,
-    recordPurchase,
   };
 
   return (
