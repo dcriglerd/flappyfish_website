@@ -11,6 +11,7 @@ import { useAudio } from '../context/AudioContext';
 import { useCloudSync } from '../context/CloudSyncContext';
 import { useAchievements } from '../context/AchievementsContext';
 import { useDailyRewards } from '../context/DailyRewardsContext';
+import { useNotifications } from '../context/NotificationsContext';
 import { COLORS } from '../constants/config';
 
 import StartScreen from '../components/StartScreen';
