@@ -322,16 +322,6 @@ export const NotificationsProvider = ({ children }) => {
     });
   }, []);
 
-  // Cancel all scheduled notifications
-  const cancelAllNotifications = useCallback(async () => {
-    try {
-      await Notifications.cancelAllScheduledNotificationsAsync();
-      console.log('[Notifications] All notifications cancelled');
-    } catch (error) {
-      console.error('[Notifications] Cancel error:', error);
-    }
-  }, []);
-
   // Cancel streak warning when user plays
   const cancelStreakWarning = useCallback(async () => {
     try {
@@ -340,6 +330,24 @@ export const NotificationsProvider = ({ children }) => {
       console.error('[Notifications] Cancel warning error:', error);
     }
   }, []);
+
+  // Enable/disable notifications
+  const toggleNotifications = useCallback(async (enabled) => {
+    setNotificationsEnabled(enabled);
+    await AsyncStorage.setItem(STORAGE_KEYS.NOTIFICATIONS_ENABLED, enabled.toString());
+    
+    if (enabled) {
+      // Request permission if not granted
+      if (permissionStatus !== 'granted') {
+        await requestPermission();
+      }
+    } else {
+      // Cancel all scheduled notifications
+      await cancelAllNotifications();
+    }
+    
+    console.log('[Notifications] Enabled:', enabled);
+  }, [permissionStatus, requestPermission, cancelAllNotifications]);
 
   // Get all scheduled notifications (for debugging)
   const getScheduledNotifications = useCallback(async () => {
