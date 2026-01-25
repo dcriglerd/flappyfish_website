@@ -38,86 +38,114 @@ export const DailyRewardsProvider = ({ children }) => {
 
   // Load saved data on mount
   useEffect(() => {
+    const loadSavedData = async () => {
+      try {
+        const [savedStreak, savedChallenges, savedProgress] = await Promise.all([
+          AsyncStorage.getItem(STORAGE_KEYS.STREAK_DATA),
+          AsyncStorage.getItem(STORAGE_KEYS.DAILY_CHALLENGES),
+          AsyncStorage.getItem(STORAGE_KEYS.CHALLENGE_PROGRESS),
+        ]);
+
+        let streak = savedStreak ? JSON.parse(savedStreak) : {
+          currentStreak: 0,
+          longestStreak: 0,
+          lastPlayDate: null,
+          streakClaimedToday: false,
+        };
+
+        // Check and update streak based on last play date
+        const today = getTodayDateString();
+        
+        if (streak.lastPlayDate) {
+          if (isToday(streak.lastPlayDate)) {
+            // Already played today - keep streak
+          } else if (isYesterday(streak.lastPlayDate)) {
+            // Played yesterday - streak continues but not claimed today
+            streak.streakClaimedToday = false;
+          } else {
+            // Missed a day - reset streak
+            streak.currentStreak = 0;
+            streak.streakClaimedToday = false;
+          }
+        }
+        
+        setStreakData(streak);
+
+        // Load or generate daily challenges
+        let challenges = savedChallenges ? JSON.parse(savedChallenges) : null;
+        let progress = savedProgress ? JSON.parse(savedProgress) : {};
+        
+        // Check if challenges need refresh (new day)
+        if (!challenges || !challenges.date || challenges.date !== today) {
+          // Generate new challenges for today
+          const seed = new Date(today).getTime();
+          const newChallenges = generateDailyChallenges(seed);
+          challenges = { date: today, challenges: newChallenges };
+          progress = { date: today, progress: {}, completed: [], bonusClaimed: false };
+          
+          await AsyncStorage.setItem(STORAGE_KEYS.DAILY_CHALLENGES, JSON.stringify(challenges));
+          await AsyncStorage.setItem(STORAGE_KEYS.CHALLENGE_PROGRESS, JSON.stringify(progress));
+        }
+        
+        setDailyChallenges(challenges.challenges || []);
+        setChallengeProgress(progress.progress || {});
+        setCompletedChallenges(progress.completed || []);
+        setAllChallengesBonusClaimed(progress.bonusClaimed || false);
+        
+        setIsLoaded(true);
+      } catch (error) {
+        console.error('[DailyRewards] Load error:', error);
+        setIsLoaded(true);
+      }
+    };
+    
     loadSavedData();
     return () => {
       if (resetTimerRef.current) clearTimeout(resetTimerRef.current);
     };
   }, []);
 
+  // Daily reset function
+  const performDailyReset = useCallback(async () => {
+    const today = getTodayDateString();
+    const seed = new Date(today).getTime();
+    const newChallenges = generateDailyChallenges(seed);
+    
+    const challenges = { date: today, challenges: newChallenges };
+    const progress = { date: today, progress: {}, completed: [], bonusClaimed: false };
+    
+    setDailyChallenges(newChallenges);
+    setChallengeProgress({});
+    setCompletedChallenges([]);
+    setAllChallengesBonusClaimed(false);
+    
+    // Update streak claimed status
+    setStreakData(prev => ({ ...prev, streakClaimedToday: false }));
+    
+    await AsyncStorage.setItem(STORAGE_KEYS.DAILY_CHALLENGES, JSON.stringify(challenges));
+    await AsyncStorage.setItem(STORAGE_KEYS.CHALLENGE_PROGRESS, JSON.stringify(progress));
+    
+    console.log('[DailyRewards] Daily reset complete');
+  }, []);
+
   // Set up daily reset timer
   useEffect(() => {
     if (isLoaded) {
-      const timeUntilReset = getTimeUntilReset();
-      resetTimerRef.current = setTimeout(() => {
-        handleDailyReset();
-      }, timeUntilReset);
+      const scheduleReset = () => {
+        const timeUntilReset = getTimeUntilReset();
+        resetTimerRef.current = setTimeout(async () => {
+          await performDailyReset();
+          scheduleReset(); // Schedule next reset
+        }, timeUntilReset);
+      };
+      
+      scheduleReset();
       
       return () => {
         if (resetTimerRef.current) clearTimeout(resetTimerRef.current);
       };
     }
-  }, [isLoaded]);
-
-  const loadSavedData = async () => {
-    try {
-      const [savedStreak, savedChallenges, savedProgress] = await Promise.all([
-        AsyncStorage.getItem(STORAGE_KEYS.STREAK_DATA),
-        AsyncStorage.getItem(STORAGE_KEYS.DAILY_CHALLENGES),
-        AsyncStorage.getItem(STORAGE_KEYS.CHALLENGE_PROGRESS),
-      ]);
-
-      let streak = savedStreak ? JSON.parse(savedStreak) : {
-        currentStreak: 0,
-        longestStreak: 0,
-        lastPlayDate: null,
-        streakClaimedToday: false,
-      };
-
-      // Check and update streak based on last play date
-      const today = getTodayDateString();
-      
-      if (streak.lastPlayDate) {
-        if (isToday(streak.lastPlayDate)) {
-          // Already played today - keep streak
-        } else if (isYesterday(streak.lastPlayDate)) {
-          // Played yesterday - streak continues but not claimed today
-          streak.streakClaimedToday = false;
-        } else {
-          // Missed a day - reset streak
-          streak.currentStreak = 0;
-          streak.streakClaimedToday = false;
-        }
-      }
-      
-      setStreakData(streak);
-
-      // Load or generate daily challenges
-      let challenges = savedChallenges ? JSON.parse(savedChallenges) : null;
-      let progress = savedProgress ? JSON.parse(savedProgress) : {};
-      
-      // Check if challenges need refresh (new day)
-      if (!challenges || !challenges.date || challenges.date !== today) {
-        // Generate new challenges for today
-        const seed = new Date(today).getTime();
-        const newChallenges = generateDailyChallenges(seed);
-        challenges = { date: today, challenges: newChallenges };
-        progress = { date: today, progress: {}, completed: [], bonusClaimed: false };
-        
-        await AsyncStorage.setItem(STORAGE_KEYS.DAILY_CHALLENGES, JSON.stringify(challenges));
-        await AsyncStorage.setItem(STORAGE_KEYS.CHALLENGE_PROGRESS, JSON.stringify(progress));
-      }
-      
-      setDailyChallenges(challenges.challenges || []);
-      setChallengeProgress(progress.progress || {});
-      setCompletedChallenges(progress.completed || []);
-      setAllChallengesBonusClaimed(progress.bonusClaimed || false);
-      
-      setIsLoaded(true);
-    } catch (error) {
-      console.error('[DailyRewards] Load error:', error);
-      setIsLoaded(true);
-    }
-  };
+  }, [isLoaded, performDailyReset]);
 
   const handleDailyReset = useCallback(async () => {
     const today = getTodayDateString();
