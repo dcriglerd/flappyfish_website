@@ -116,6 +116,8 @@ const FlappyFishGame = () => {
     cancelStreakWarning,
   } = useNotifications();
 
+  const { getDisplayName, username } = useAuth();
+
   // Update notifications when streak data changes
   useEffect(() => {
     updateStreakNotifications(currentStreak, streakClaimedToday, streakClaimedToday);
