@@ -10,6 +10,7 @@ import { useAds } from '../context/AdsContext';
 import { useAudio } from '../context/AudioContext';
 import { useCloudSync } from '../context/CloudSyncContext';
 import { useAchievements } from '../context/AchievementsContext';
+import { useDailyRewards } from '../context/DailyRewardsContext';
 import { COLORS } from '../constants/config';
 
 import StartScreen from '../components/StartScreen';
@@ -24,6 +25,7 @@ import PowerUpBar from '../components/PowerUpBar';
 import LeaderboardModal from '../components/LeaderboardModal';
 import AchievementsModal from '../components/AchievementsModal';
 import AchievementUnlockNotification from '../components/AchievementUnlockNotification';
+import DailyRewardsModal from '../components/DailyRewardsModal';
 
 const FlappyFishGame = () => {
   const [isMuted, setIsMuted] = useState(false);
@@ -31,9 +33,11 @@ const FlappyFishGame = () => {
   const [showSkins, setShowSkins] = useState(false);
   const [showLeaderboard, setShowLeaderboard] = useState(false);
   const [showAchievements, setShowAchievements] = useState(false);
+  const [showDailyRewards, setShowDailyRewards] = useState(false);
   const [isLoadingCloudData, setIsLoadingCloudData] = useState(true);
   
   const coinsCollectedInGame = useRef(0);
+  const usedPowerUpInGame = useRef(false);
   
   const {
     gameState,
