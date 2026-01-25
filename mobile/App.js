@@ -8,6 +8,7 @@ import { AdsProvider } from './src/context/AdsContext';
 import { GameProvider } from './src/context/GameContext';
 import { AudioProvider } from './src/context/AudioContext';
 import { PurchasesProvider } from './src/context/PurchasesContext';
+import { CloudSyncProvider } from './src/context/CloudSyncContext';
 
 export default function App() {
   const [isReady, setIsReady] = useState(false);
@@ -54,15 +55,17 @@ export default function App() {
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar style="light" />
-      <PurchasesProvider>
-        <AudioProvider>
-          <AdsProvider>
-            <GameProvider>
-              <FlappyFishGame />
-            </GameProvider>
-          </AdsProvider>
-        </AudioProvider>
-      </PurchasesProvider>
+      <CloudSyncProvider>
+        <PurchasesProvider>
+          <AudioProvider>
+            <AdsProvider>
+              <GameProvider>
+                <FlappyFishGame />
+              </GameProvider>
+            </AdsProvider>
+          </AudioProvider>
+        </PurchasesProvider>
+      </CloudSyncProvider>
     </SafeAreaView>
   );
 }
