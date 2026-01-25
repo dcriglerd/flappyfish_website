@@ -11,6 +11,7 @@ import { PurchasesProvider } from './src/context/PurchasesContext';
 import { CloudSyncProvider } from './src/context/CloudSyncContext';
 import { AchievementsProvider } from './src/context/AchievementsContext';
 import { DailyRewardsProvider } from './src/context/DailyRewardsContext';
+import { NotificationsProvider } from './src/context/NotificationsContext';
 
 export default function App() {
   const [isReady, setIsReady] = useState(false);
