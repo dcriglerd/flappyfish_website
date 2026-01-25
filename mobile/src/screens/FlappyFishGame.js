@@ -103,7 +103,27 @@ const FlappyFishGame = () => {
     streakClaimedToday,
     updateChallengeProgress,
     loadFromCloud: loadDailyRewardsFromCloud,
+    completedChallenges,
+    dailyChallenges,
   } = useDailyRewards();
+
+  const {
+    updateStreakNotifications,
+    scheduleDailyChallengeReminder,
+    cancelStreakWarning,
+  } = useNotifications();
+
+  // Update notifications when streak data changes
+  useEffect(() => {
+    updateStreakNotifications(currentStreak, streakClaimedToday, streakClaimedToday);
+  }, [currentStreak, streakClaimedToday, updateStreakNotifications]);
+
+  // Update challenge notifications
+  useEffect(() => {
+    if (dailyChallenges.length > 0) {
+      scheduleDailyChallengeReminder(completedChallenges.length, dailyChallenges.length);
+    }
+  }, [completedChallenges.length, dailyChallenges.length, scheduleDailyChallengeReminder]);
 
   // Load cloud data on app start
   useEffect(() => {
