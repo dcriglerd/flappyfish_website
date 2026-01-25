@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useCallback, useEffect } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useAuth } from './AuthContext';
 
 const CloudSyncContext = createContext();
 
@@ -8,45 +9,34 @@ const API_BASE_URL = 'https://oceanflap.preview.emergentagent.com/api';
 
 // Storage keys
 const STORAGE_KEYS = {
-  USER_ID: 'flappyfish_cloud_user_id',
   LAST_SYNC: 'flappyfish_last_sync',
 };
 
 export const CloudSyncProvider = ({ children }) => {
-  const [userId, setUserId] = useState(null);
+  const { userId, username, isInitialized: authInitialized } = useAuth();
   const [isSyncing, setIsSyncing] = useState(false);
   const [lastSyncTime, setLastSyncTime] = useState(null);
   const [isOnline, setIsOnline] = useState(true);
   const [error, setError] = useState(null);
 
-  // Initialize user ID on mount
+  // Load last sync time on mount
   useEffect(() => {
-    initializeUser();
-  }, []);
-
-  const initializeUser = async () => {
-    try {
-      let storedUserId = await AsyncStorage.getItem(STORAGE_KEYS.USER_ID);
-      
-      if (!storedUserId) {
-        // Generate new user ID
-        storedUserId = `user_${Date.now()}_${Math.random().toString(36).substring(7)}`;
-        await AsyncStorage.setItem(STORAGE_KEYS.USER_ID, storedUserId);
+    const loadLastSync = async () => {
+      try {
+        const lastSync = await AsyncStorage.getItem(STORAGE_KEYS.LAST_SYNC);
+        if (lastSync) {
+          setLastSyncTime(new Date(lastSync));
+        }
+      } catch (err) {
+        console.error('[CloudSync] Load last sync error:', err);
       }
-      
-      setUserId(storedUserId);
-      
-      // Load last sync time
-      const lastSync = await AsyncStorage.getItem(STORAGE_KEYS.LAST_SYNC);
-      if (lastSync) {
-        setLastSyncTime(new Date(lastSync));
-      }
-      
-      console.log('[CloudSync] Initialized with user ID:', storedUserId);
-    } catch (err) {
-      console.error('[CloudSync] Init error:', err);
+    };
+    
+    if (authInitialized) {
+      loadLastSync();
+      console.log('[CloudSync] Initialized with user ID from AuthContext:', userId);
     }
-  };
+  }, [authInitialized, userId]);
 
   // Sync game data to cloud
   const syncToCloud = useCallback(async (gameData) => {
