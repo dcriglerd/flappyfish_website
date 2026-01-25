@@ -78,6 +78,7 @@ const FlappyFishGame = () => {
     showBannerAd,
     removeAds,
     adsRemoved,
+    setGameplayActive,
   } = useAds();
 
   const {
