@@ -37,8 +37,76 @@ export const NotificationsProvider = ({ children }) => {
 
   // Initialize on mount
   useEffect(() => {
+    const loadSettings = async () => {
+      try {
+        const enabled = await AsyncStorage.getItem(STORAGE_KEYS.NOTIFICATIONS_ENABLED);
+        setNotificationsEnabled(enabled === 'true');
+      } catch (error) {
+        console.error('[Notifications] Load settings error:', error);
+      }
+    };
+
+    const registerForPush = async () => {
+      if (!Device.isDevice) {
+        console.log('[Notifications] Must use physical device for push notifications');
+        return null;
+      }
+
+      try {
+        const { status: existingStatus } = await Notifications.getPermissionsAsync();
+        let finalStatus = existingStatus;
+        
+        setPermissionStatus(existingStatus);
+
+        if (existingStatus !== 'granted') {
+          const { status } = await Notifications.requestPermissionsAsync();
+          finalStatus = status;
+          setPermissionStatus(status);
+        }
+
+        if (finalStatus !== 'granted') {
+          console.log('[Notifications] Permission not granted');
+          return null;
+        }
+
+        // Get Expo push token
+        const tokenData = await Notifications.getExpoPushTokenAsync({
+          projectId: 'flappy-fish',
+        });
+        
+        const token = tokenData.data;
+        setExpoPushToken(token);
+        await AsyncStorage.setItem(STORAGE_KEYS.PUSH_TOKEN, token);
+        
+        console.log('[Notifications] Push token:', token);
+
+        // Configure notification channel for Android
+        if (Platform.OS === 'android') {
+          await Notifications.setNotificationChannelAsync('default', {
+            name: 'Flappy Fish',
+            importance: Notifications.AndroidImportance.HIGH,
+            vibrationPattern: [0, 250, 250, 250],
+            lightColor: '#f1c40f',
+          });
+          
+          await Notifications.setNotificationChannelAsync('streak', {
+            name: 'Streak Reminders',
+            importance: Notifications.AndroidImportance.HIGH,
+            description: 'Reminders to keep your daily streak',
+            vibrationPattern: [0, 250, 250, 250],
+            lightColor: '#e74c3c',
+          });
+        }
+
+        return token;
+      } catch (error) {
+        console.error('[Notifications] Registration error:', error);
+        return null;
+      }
+    };
+
     loadSettings();
-    registerForPushNotifications();
+    registerForPush();
     
     // Listen for incoming notifications
     notificationListener.current = Notifications.addNotificationReceivedListener(notification => {
@@ -48,7 +116,6 @@ export const NotificationsProvider = ({ children }) => {
     // Listen for notification responses (when user taps)
     responseListener.current = Notifications.addNotificationResponseReceivedListener(response => {
       console.log('[Notifications] Tapped:', response);
-      // Could navigate to specific screen based on notification data
     });
 
     return () => {
@@ -60,19 +127,6 @@ export const NotificationsProvider = ({ children }) => {
       }
     };
   }, []);
-
-  const loadSettings = async () => {
-    try {
-      const enabled = await AsyncStorage.getItem(STORAGE_KEYS.NOTIFICATIONS_ENABLED);
-      setNotificationsEnabled(enabled === 'true');
-    } catch (error) {
-      console.error('[Notifications] Load settings error:', error);
-    }
-  };
-
-  // Register for push notifications
-  const registerForPushNotifications = async () => {
-    if (!Device.isDevice) {
       console.log('[Notifications] Must use physical device for push notifications');
       return null;
     }
