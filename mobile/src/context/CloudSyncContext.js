@@ -5,7 +5,7 @@ import { useAuth } from './AuthContext';
 const CloudSyncContext = createContext();
 
 // API Base URL - Your backend URL
-const API_BASE_URL = 'https://oceanflap.preview.emergentagent.com/api';
+const API_BASE_URL = 'https://ocean-dash-5.preview.emergentagent.com/api';
 
 // Storage keys
 const STORAGE_KEYS = {
