@@ -5,11 +5,11 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const PurchasesContext = createContext();
 
-// RevenueCat API Key
-const REVENUECAT_API_KEY = 'test_NABQGDjFGFjEYgtuLvYsspaTccY';
+// RevenueCat API Key (Google Play)
+const REVENUECAT_API_KEY = 'appba12e0d3b9';
 
 // RevenueCat App ID
-const REVENUECAT_APP_ID = 'appe2d4a5dd69';
+const REVENUECAT_APP_ID = 'appba12e0d3b9';
 
 // Product identifiers (must match RevenueCat dashboard)
 export const PRODUCT_IDS = {
