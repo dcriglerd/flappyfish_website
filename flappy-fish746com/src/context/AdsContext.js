@@ -43,6 +43,7 @@ export const AdsProvider = ({ children }) => {
   const [isInterstitialLoaded, setIsInterstitialLoaded] = useState(false);
   const [isRewardedLoaded, setIsRewardedLoaded] = useState(false);
   const [isAppOpenLoaded, setIsAppOpenLoaded] = useState(false);
+  const [isGamePlaying, setIsGamePlaying] = useState(false); // Track if game is active
   
   const deathCountRef = useRef(0);
   const interstitialRef = useRef(null);
