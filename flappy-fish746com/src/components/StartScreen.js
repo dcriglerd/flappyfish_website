@@ -258,16 +258,6 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     marginBottom: 12,
   },
-  shopButton: {
-    flex: 1,
-    backgroundColor: COLORS.GREEN,
-    paddingVertical: 14,
-    borderRadius: 12,
-    alignItems: 'center',
-    marginRight: 8,
-    borderWidth: 3,
-    borderColor: '#196f3d',
-  },
   skinsButton: {
     flex: 1,
     backgroundColor: '#9333ea',
