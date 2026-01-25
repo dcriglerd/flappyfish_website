@@ -456,6 +456,8 @@ const FlappyFishGame = () => {
           achievementProgress={`${getUnlockedCount()}/${getTotalCount()}`}
           currentStreak={currentStreak}
           hasUnclaimedStreak={!streakClaimedToday}
+          displayName={getDisplayName()}
+          onOpenProfile={handleOpenProfile}
         />
       )}
 
