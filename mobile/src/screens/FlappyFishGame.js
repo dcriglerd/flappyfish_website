@@ -393,12 +393,15 @@ const FlappyFishGame = () => {
           onOpenSkins={handleOpenSkins}
           onOpenLeaderboard={handleOpenLeaderboard}
           onOpenAchievements={handleOpenAchievements}
+          onOpenDailyRewards={handleOpenDailyRewards}
           highScore={highScore}
           coins={coins}
           isMuted={isMuted}
           onToggleMute={handleToggleMute}
           selectedSkin={selectedSkin}
           achievementProgress={`${getUnlockedCount()}/${getTotalCount()}`}
+          currentStreak={currentStreak}
+          hasUnclaimedStreak={!streakClaimedToday}
         />
       )}
 
