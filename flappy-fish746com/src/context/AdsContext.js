@@ -212,7 +212,13 @@ export const AdsProvider = ({ children }) => {
 
   // Show App Open Ad
   const showAppOpenAd = useCallback(() => {
-    if (adsRemoved) return;
+    if (adsRemoved || AD_CONFIG.DISABLE_APP_OPEN_ADS) return;
+    
+    // Never show during gameplay
+    if (isGamePlaying) {
+      console.log('[AdsManager] Skipping App Open ad - game in progress');
+      return;
+    }
     
     if (isAppOpenLoaded && appOpenRef.current) {
       console.log('[AdsManager] Showing App Open ad...');
