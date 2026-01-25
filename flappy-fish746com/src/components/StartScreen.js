@@ -91,14 +91,10 @@ const StartScreen = ({
           <Text style={styles.startButtonText}>▶ START</Text>
         </TouchableOpacity>
 
-        <View style={styles.middleButtons}>
-          <TouchableOpacity style={styles.shopButton} onPress={onOpenShop} activeOpacity={0.8}>
-            <Text style={styles.buttonText}>🛍 Shop</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.skinsButton} onPress={onOpenSkins} activeOpacity={0.8}>
-            <Text style={styles.buttonText}>✨ Skins</Text>
-          </TouchableOpacity>
-        </View>
+        {/* Skins Button */}
+        <TouchableOpacity style={styles.skinsButton} onPress={onOpenSkins} activeOpacity={0.8}>
+          <Text style={styles.buttonText}>✨ Skins</Text>
+        </TouchableOpacity>
 
         {/* Daily Rewards Button */}
         <TouchableOpacity 
