@@ -526,6 +526,13 @@ const FlappyFishGame = () => {
         onClose={handleCloseDailyRewards}
         onClaimCoins={handleClaimDailyCoins}
       />
+
+      {/* Username/Profile Modal */}
+      <UsernameModal
+        visible={showUsernameModal}
+        onClose={handleCloseProfile}
+        onSave={handleUsernameSaved}
+      />
     </View>
   );
 };
