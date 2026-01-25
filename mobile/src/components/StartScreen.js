@@ -256,6 +256,27 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '700',
   },
+  dailyRewardsButton: {
+    backgroundColor: '#c0392b',
+    paddingVertical: 14,
+    borderRadius: 12,
+    alignItems: 'center',
+    borderWidth: 3,
+    borderColor: '#e74c3c',
+    marginBottom: 10,
+  },
+  dailyRewardsButtonGlow: {
+    shadowColor: '#e74c3c',
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0.8,
+    shadowRadius: 10,
+    elevation: 8,
+  },
+  dailyRewardsButtonText: {
+    color: COLORS.WHITE,
+    fontSize: 16,
+    fontWeight: '700',
+  },
   leaderboardButton: {
     backgroundColor: '#1e3a5f',
     paddingVertical: 14,
