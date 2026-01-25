@@ -20,6 +20,7 @@ export const AchievementsProvider = ({ children }) => {
     shieldsUsed: 0,
   });
   const [newlyUnlocked, setNewlyUnlocked] = useState(null); // For showing unlock notification
+  const [isLoaded, setIsLoaded] = useState(false);
   const pendingRewardsRef = useRef([]);
 
   // Load saved data on mount
@@ -41,10 +42,47 @@ export const AchievementsProvider = ({ children }) => {
       if (savedStats) {
         setStats(prev => ({ ...prev, ...JSON.parse(savedStats) }));
       }
+      
+      setIsLoaded(true);
     } catch (error) {
       console.error('[Achievements] Load error:', error);
+      setIsLoaded(true);
     }
   };
+
+  // Load from cloud data (called when cloud sync fetches data)
+  const loadFromCloud = useCallback(async (cloudData) => {
+    try {
+      if (!cloudData) return;
+      
+      const cloudUnlocked = cloudData.unlocked_achievements || [];
+      const cloudStats = cloudData.achievement_stats || {};
+      
+      // Merge with local data (keep more achievements)
+      const mergedUnlocked = [...new Set([...unlockedAchievements, ...cloudUnlocked])];
+      
+      // Merge stats (keep higher values)
+      const mergedStats = {
+        totalCoinsEarned: Math.max(stats.totalCoinsEarned, cloudStats.totalCoinsEarned || 0),
+        gamesPlayed: Math.max(stats.gamesPlayed, cloudStats.gamesPlayed || 0),
+        highScore: Math.max(stats.highScore, cloudStats.highScore || 0),
+        skinsUnlocked: Math.max(stats.skinsUnlocked, cloudStats.skinsUnlocked || 1),
+        powerupsUsed: Math.max(stats.powerupsUsed, cloudStats.powerupsUsed || 0),
+        shieldsUsed: Math.max(stats.shieldsUsed, cloudStats.shieldsUsed || 0),
+      };
+      
+      setUnlockedAchievements(mergedUnlocked);
+      setStats(mergedStats);
+      
+      // Save merged data locally
+      await AsyncStorage.setItem(STORAGE_KEYS.UNLOCKED, JSON.stringify(mergedUnlocked));
+      await AsyncStorage.setItem(STORAGE_KEYS.STATS, JSON.stringify(mergedStats));
+      
+      console.log('[Achievements] Merged with cloud data:', { mergedUnlocked, mergedStats });
+    } catch (error) {
+      console.error('[Achievements] Load from cloud error:', error);
+    }
+  }, [unlockedAchievements, stats]);
 
   // Save achievements
   const saveAchievements = useCallback(async (unlocked) => {
