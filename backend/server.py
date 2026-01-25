@@ -39,6 +39,7 @@ class StatusCheckCreate(BaseModel):
 class GameDataCreate(BaseModel):
     """Model for creating/updating game data"""
     user_id: str
+    username: Optional[str] = None
     high_score: int = 0
     coins: int = 0
     unlocked_skins: List[str] = ["default"]
@@ -54,6 +55,7 @@ class GameDataResponse(BaseModel):
     """Model for game data response"""
     model_config = ConfigDict(extra="ignore")
     user_id: str
+    username: Optional[str] = None
     high_score: int = 0
     coins: int = 0
     unlocked_skins: List[str] = ["default"]
