@@ -164,16 +164,18 @@ const FlappyFishGame = () => {
     setMuted(isMuted);
   }, [isMuted, setMuted]);
 
-  // Manage banner visibility based on game state
+  // Manage banner visibility and gameplay state based on game state
   useEffect(() => {
     if (gameState === 'playing') {
       hideBanner();
+      setGameplayActive(true); // Tell ads system game is active
       coinsCollectedInGame.current = 0; // Reset coins counter
       usedPowerUpInGame.current = false; // Reset power-up tracker
     } else {
       showBannerAd();
+      setGameplayActive(false); // Game is not active, ads can show
     }
-  }, [gameState, hideBanner, showBannerAd]);
+  }, [gameState, hideBanner, showBannerAd, setGameplayActive]);
 
   // Sync to cloud and check achievements on game over
   useEffect(() => {
