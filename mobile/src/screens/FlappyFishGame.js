@@ -364,6 +364,32 @@ const FlappyFishGame = () => {
     console.log('[Game] Daily reward claimed:', message, amount);
   }, [addCoins]);
 
+  // Username/Profile handlers
+  const handleOpenProfile = useCallback(() => {
+    setShowUsernameModal(true);
+  }, []);
+
+  const handleCloseProfile = useCallback(() => {
+    setShowUsernameModal(false);
+  }, []);
+
+  const handleUsernameSaved = useCallback((newUsername) => {
+    console.log('[Game] Username saved:', newUsername);
+    // Trigger a sync to update backend with new username
+    syncToCloud({
+      highScore,
+      coins,
+      unlockedSkins,
+      selectedSkin,
+      ownedPowerUps,
+      adsRemoved,
+      totalGamesPlayed: achievementStats.gamesPlayed,
+      totalCoinsEarned: achievementStats.totalCoinsEarned,
+      unlockedAchievements,
+      achievementStats,
+    });
+  }, [highScore, coins, unlockedSkins, selectedSkin, ownedPowerUps, adsRemoved, achievementStats, unlockedAchievements, syncToCloud]);
+
   // Power-up activation during gameplay
   const handleActivatePowerUp = useCallback((powerUpId) => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
