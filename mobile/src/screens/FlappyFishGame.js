@@ -321,12 +321,29 @@ const FlappyFishGame = () => {
     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
   }, [addCoins]);
 
+  // Daily Rewards handlers
+  const handleOpenDailyRewards = useCallback(() => {
+    setShowDailyRewards(true);
+  }, []);
+
+  const handleCloseDailyRewards = useCallback(() => {
+    setShowDailyRewards(false);
+  }, []);
+
+  const handleClaimDailyCoins = useCallback((amount, message) => {
+    addCoins(amount);
+    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+    console.log('[Game] Daily reward claimed:', message, amount);
+  }, [addCoins]);
+
   // Power-up activation during gameplay
   const handleActivatePowerUp = useCallback((powerUpId) => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
     activatePowerUp(powerUpId);
     // Update achievement stats
     updateStats({ powerupUsed: true });
+    // Track for daily challenges
+    usedPowerUpInGame.current = true;
   }, [activatePowerUp, updateStats]);
 
   return (
