@@ -80,12 +80,6 @@ const NotificationSettings = ({ compact = false }) => {
           </Text>
         </View>
       )}
-
-      {__DEV__ && (
-        <TouchableOpacity style={styles.testButton} onPress={sendTestNotification}>
-          <Text style={styles.testButtonText}>🧪 Send Test Notification</Text>
-        </TouchableOpacity>
-      )}
     </View>
   );
 };
