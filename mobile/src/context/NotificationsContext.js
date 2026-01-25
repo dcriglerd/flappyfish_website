@@ -127,6 +127,10 @@ export const NotificationsProvider = ({ children }) => {
       }
     };
   }, []);
+
+  // Request permission (can be called manually)
+  const requestPermission = useCallback(async () => {
+    if (!Device.isDevice) {
       console.log('[Notifications] Must use physical device for push notifications');
       return null;
     }
@@ -150,7 +154,7 @@ export const NotificationsProvider = ({ children }) => {
 
       // Get Expo push token
       const tokenData = await Notifications.getExpoPushTokenAsync({
-        projectId: 'flappy-fish', // Replace with your Expo project ID if needed
+        projectId: 'flappy-fish',
       });
       
       const token = tokenData.data;
@@ -182,27 +186,17 @@ export const NotificationsProvider = ({ children }) => {
       console.error('[Notifications] Registration error:', error);
       return null;
     }
-  };
+  }, []);
 
-  // Enable/disable notifications
-  const toggleNotifications = useCallback(async (enabled) => {
-    setNotificationsEnabled(enabled);
-    await AsyncStorage.setItem(STORAGE_KEYS.NOTIFICATIONS_ENABLED, enabled.toString());
-    
-    if (enabled) {
-      // Request permission if not granted
-      if (permissionStatus !== 'granted') {
-        await registerForPushNotifications();
-      }
-      // Schedule default notifications
-      await scheduleStreakReminder();
-    } else {
-      // Cancel all scheduled notifications
-      await cancelAllNotifications();
+  // Cancel all scheduled notifications
+  const cancelAllNotifications = useCallback(async () => {
+    try {
+      await Notifications.cancelAllScheduledNotificationsAsync();
+      console.log('[Notifications] All notifications cancelled');
+    } catch (error) {
+      console.error('[Notifications] Cancel error:', error);
     }
-    
-    console.log('[Notifications] Enabled:', enabled);
-  }, [permissionStatus]);
+  }, []);
 
   // Schedule streak reminder notification
   const scheduleStreakReminder = useCallback(async (streakCount = 0) => {
