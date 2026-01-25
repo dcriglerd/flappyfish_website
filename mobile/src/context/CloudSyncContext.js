@@ -3,8 +3,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const CloudSyncContext = createContext();
 
-// API Base URL - Update this with your actual backend URL
-const API_BASE_URL = 'https://your-backend-url.com/api';
+// API Base URL - Your backend URL
+const API_BASE_URL = 'https://marine-flap.preview.emergentagent.com/api';
 
 // Storage keys
 const STORAGE_KEYS = {
