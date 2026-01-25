@@ -10,6 +10,7 @@ import { AudioProvider } from './src/context/AudioContext';
 import { PurchasesProvider } from './src/context/PurchasesContext';
 import { CloudSyncProvider } from './src/context/CloudSyncContext';
 import { AchievementsProvider } from './src/context/AchievementsContext';
+import { DailyRewardsProvider } from './src/context/DailyRewardsContext';
 
 export default function App() {
   const [isReady, setIsReady] = useState(false);
