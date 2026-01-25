@@ -58,13 +58,15 @@ export default function App() {
       <StatusBar style="light" />
       <CloudSyncProvider>
         <PurchasesProvider>
-          <AudioProvider>
-            <AdsProvider>
-              <GameProvider>
-                <FlappyFishGame />
-              </GameProvider>
-            </AdsProvider>
-          </AudioProvider>
+          <AchievementsProvider>
+            <AudioProvider>
+              <AdsProvider>
+                <GameProvider>
+                  <FlappyFishGame />
+                </GameProvider>
+              </AdsProvider>
+            </AudioProvider>
+          </AchievementsProvider>
         </PurchasesProvider>
       </CloudSyncProvider>
     </SafeAreaView>
