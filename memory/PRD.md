@@ -154,6 +154,15 @@ Located in `/app/mobile/src/constants/config.js`:
     - POST /api/webhook/revenuecat - RevenueCat webhook
   - CloudSyncContext for mobile app
 
+- [x] Leaderboard UI - Dec 2025
+  - LeaderboardModal component with top 100 players
+  - User rank display card
+  - Pull-to-refresh functionality
+  - Medal emojis for top 3 (🥇🥈🥉)
+  - Current user highlighting
+  - Connected to backend API
+  - Auto-sync on game over
+
 ## P2 - Future Tasks
 - [ ] Real payment processor (Stripe/RevenueCat)
 - [ ] Backend for user data persistence
