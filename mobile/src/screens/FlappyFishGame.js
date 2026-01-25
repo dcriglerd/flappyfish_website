@@ -12,6 +12,7 @@ import { useCloudSync } from '../context/CloudSyncContext';
 import { useAchievements } from '../context/AchievementsContext';
 import { useDailyRewards } from '../context/DailyRewardsContext';
 import { useNotifications } from '../context/NotificationsContext';
+import { useAuth } from '../context/AuthContext';
 import { COLORS } from '../constants/config';
 
 import StartScreen from '../components/StartScreen';
