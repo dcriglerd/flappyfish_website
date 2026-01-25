@@ -47,6 +47,8 @@ class GameDataCreate(BaseModel):
     ads_removed: bool = False
     total_games_played: int = 0
     total_coins_earned: int = 0
+    unlocked_achievements: List[str] = []
+    achievement_stats: Dict[str, int] = {}
 
 class GameDataResponse(BaseModel):
     """Model for game data response"""
@@ -60,6 +62,8 @@ class GameDataResponse(BaseModel):
     ads_removed: bool = False
     total_games_played: int = 0
     total_coins_earned: int = 0
+    unlocked_achievements: List[str] = []
+    achievement_stats: Dict[str, int] = {}
     created_at: str
     updated_at: str
 
@@ -142,6 +146,8 @@ async def sync_game_data(data: GameDataCreate):
             "ads_removed": data.ads_removed or existing.get("ads_removed", False),
             "total_games_played": max(data.total_games_played, existing.get("total_games_played", 0)),
             "total_coins_earned": max(data.total_coins_earned, existing.get("total_coins_earned", 0)),
+            "unlocked_achievements": list(set(existing.get("unlocked_achievements", []) + data.unlocked_achievements)),
+            "achievement_stats": {**existing.get("achievement_stats", {}), **data.achievement_stats},
             "updated_at": now,
         }
         
