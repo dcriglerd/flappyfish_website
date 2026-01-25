@@ -13,7 +13,6 @@ const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
 const StartScreen = ({ 
   onStart, 
-  onOpenShop, 
   onOpenSkins, 
   onOpenLeaderboard,
   onOpenAchievements,
