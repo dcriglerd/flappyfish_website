@@ -11,7 +11,9 @@ import {
 } from 'react-native';
 import { COLORS } from '../constants/config';
 import { useDailyRewards } from '../context/DailyRewardsContext';
+import { useNotifications } from '../context/NotificationsContext';
 import { STREAK_REWARDS, getTimeUntilReset, ALL_CHALLENGES_BONUS } from '../data/dailyRewards';
+import NotificationSettings from './NotificationSettings';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
