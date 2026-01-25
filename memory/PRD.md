@@ -227,6 +227,21 @@ Located in `/app/mobile/src/constants/config.js`:
   - DailyRewardsModal with tabbed UI (Streak / Challenges)
   - Persisted to AsyncStorage with daily refresh logic
 
+- [x] Push Notifications - Jan 2025
+  - **Streak Reminders:**
+    - Daily reminder at 8 PM to play and maintain streak
+    - Random motivational messages
+  - **Streak Warnings:**
+    - Urgent notification at 10 PM if player hasn't played
+    - Warns about losing streak at midnight
+  - **Challenge Reminders:**
+    - Notification at 6 PM about incomplete daily challenges
+  - NotificationsContext for state management
+  - NotificationSettings component (compact mode for modals)
+  - Toggle on/off in Daily Rewards modal
+  - Uses expo-notifications for scheduling
+  - Android notification channels configured
+
 ## P1 - Upcoming Tasks
 - [ ] User Authentication - Replace device-based user ID with proper auth
 - [ ] Finalize IAP with Production Keys
