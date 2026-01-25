@@ -293,27 +293,6 @@ const FlappyFishGame = () => {
     setIsMuted(prev => !prev);
   }, []);
 
-  // Shop handlers
-  const handleOpenShop = useCallback(() => {
-    setShowShop(true);
-  }, []);
-
-  const handleCloseShop = useCallback(() => {
-    setShowShop(false);
-  }, []);
-
-  const handlePurchaseCoins = useCallback((amount) => {
-    addCoins(amount);
-  }, [addCoins]);
-
-  const handleBuyPowerUp = useCallback((powerUp) => {
-    buyPowerUp(powerUp);
-  }, [buyPowerUp]);
-
-  const handleRemoveAds = useCallback(() => {
-    removeAds();
-  }, [removeAds]);
-
   // Skins handlers
   const handleOpenSkins = useCallback(() => {
     setShowSkins(true);
