@@ -60,6 +60,7 @@ Build a "Flappy Bird" clone named "Flappy Fish" with:
 │   │   ├── LeaderboardModal.js # Global rankings
 │   │   ├── AchievementsModal.js # Achievement tracking
 │   │   ├── AchievementUnlockNotification.js # Unlock popup
+│   │   ├── DailyRewardsModal.js # Streaks & challenges
 │   │   └── PowerUpBar.js     # Active power-ups
 │   ├── context/
 │   │   ├── GameContext.js    # Game state & logic
@@ -67,10 +68,12 @@ Build a "Flappy Bird" clone named "Flappy Fish" with:
 │   │   ├── AudioContext.js   # Sound effects
 │   │   ├── PurchasesContext.js # RevenueCat IAP
 │   │   ├── CloudSyncContext.js # Backend sync & leaderboard
-│   │   └── AchievementsContext.js # Achievement tracking
+│   │   ├── AchievementsContext.js # Achievement tracking
+│   │   └── DailyRewardsContext.js # Streaks & daily challenges
 │   ├── data/
 │   │   ├── gameData.js       # Skins & power-ups
-│   │   └── achievements.js   # Achievement definitions
+│   │   ├── achievements.js   # Achievement definitions
+│   │   └── dailyRewards.js   # Streak & challenge configs
 │   ├── constants/
 │   │   └── config.js         # Game config & Ad IDs
 │   └── screens/
