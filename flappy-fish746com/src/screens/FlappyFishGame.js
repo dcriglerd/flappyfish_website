@@ -21,7 +21,6 @@ import GameUI from '../components/GameUI';
 import BannerAdComponent from '../components/BannerAdComponent';
 import Background from '../components/Background';
 import GameCanvas from '../components/GameCanvas';
-import ShopModal from '../components/ShopModal';
 import SkinsModal from '../components/SkinsModal';
 import PowerUpBar from '../components/PowerUpBar';
 import LeaderboardModal from '../components/LeaderboardModal';
@@ -32,7 +31,6 @@ import UsernameModal from '../components/UsernameModal';
 
 const FlappyFishGame = () => {
   const [isMuted, setIsMuted] = useState(false);
-  const [showShop, setShowShop] = useState(false);
   const [showSkins, setShowSkins] = useState(false);
   const [showLeaderboard, setShowLeaderboard] = useState(false);
   const [showAchievements, setShowAchievements] = useState(false);
