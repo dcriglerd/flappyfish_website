@@ -93,10 +93,19 @@ export const AdsProvider = ({ children }) => {
     interstitialRef.current = interstitial;
     interstitial.load();
 
+    // Periodic preload check for interstitial
+    const preloadInterval = setInterval(() => {
+      if (!isInterstitialLoaded && interstitialRef.current) {
+        console.log('[AdsManager] Periodic interstitial preload');
+        interstitialRef.current.load();
+      }
+    }, 15000); // Check every 15 seconds
+
     return () => {
       unsubscribeLoaded();
       unsubscribeClosed();
       unsubscribeError();
+      clearInterval(preloadInterval);
     };
   }, [adsRemoved]);
 
