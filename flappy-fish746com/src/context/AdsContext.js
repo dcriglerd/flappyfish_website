@@ -220,12 +220,24 @@ export const AdsProvider = ({ children }) => {
     };
   }, [adsRemoved, isGamePlaying]);
 
-  // Show App Open ad on initial launch - DISABLED to not interrupt
+  // Show App Open ad on initial launch
   useEffect(() => {
-    // Disabled - don't show app open ad on launch
-    // This was interrupting the user experience
-    return;
-  }, [isAppOpenLoaded, adsRemoved]);
+    // Show app open ad on first launch after a short delay
+    if (isAppOpenLoaded && !adsRemoved && !AD_CONFIG.DISABLE_APP_OPEN_ADS) {
+      const timer = setTimeout(() => {
+        if (appOpenRef.current && !isGamePlaying) {
+          console.log('[AdsManager] Showing App Open ad on launch...');
+          lastAppOpenShowTime.current = Date.now();
+          try {
+            appOpenRef.current.show();
+          } catch (e) {
+            console.log('[AdsManager] Error showing app open ad:', e);
+          }
+        }
+      }, 1500);
+      return () => clearTimeout(timer);
+    }
+  }, [isAppOpenLoaded, adsRemoved, isGamePlaying]);
 
   // Show App Open Ad
   const showAppOpenAd = useCallback(() => {
