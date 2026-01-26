@@ -35,17 +35,17 @@ export const AD_CONFIG = {
     },
   },
 
-  // Interstitial frequency (show every N game overs) - increased to reduce interruptions
-  INTERSTITIAL_FREQUENCY: 5,
+  // Interstitial frequency - show every N game overs (lower = more frequent)
+  INTERSTITIAL_FREQUENCY: 2,
   
-  // Interstitial on game START frequency (show every N game starts)
-  INTERSTITIAL_START_FREQUENCY: 3,
+  // Interstitial on game START frequency - show every N game starts
+  INTERSTITIAL_START_FREQUENCY: 2,
   
-  // App Open ad cooldown in milliseconds (2 minutes)
-  APP_OPEN_COOLDOWN: 120000,
+  // App Open ad cooldown in milliseconds (1 minute)
+  APP_OPEN_COOLDOWN: 60000,
   
-  // Disable App Open ads completely (set to true to disable)
-  DISABLE_APP_OPEN_ADS: true,
+  // Enable App Open ads on app foreground
+  DISABLE_APP_OPEN_ADS: false,
 };
 
 // Game Configuration
