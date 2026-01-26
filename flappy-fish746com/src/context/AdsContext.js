@@ -275,11 +275,19 @@ export const AdsProvider = ({ children }) => {
       setTimeout(() => {
         if (isInterstitialLoaded && interstitialRef.current) {
           console.log('[AdsManager] Showing interstitial on game over...');
-          interstitialRef.current.show();
+          try {
+            interstitialRef.current.show();
+          } catch (e) {
+            console.log('[AdsManager] Error showing interstitial:', e);
+            interstitialRef.current.load();
+          }
         } else {
-          console.log('[AdsManager] Interstitial not ready for game over');
+          console.log('[AdsManager] Interstitial not ready for game over, loading...');
+          if (interstitialRef.current) {
+            interstitialRef.current.load();
+          }
         }
-      }, 500);
+      }, 300);
     }
   }, [adsRemoved, isInterstitialLoaded]);
 
@@ -289,20 +297,27 @@ export const AdsProvider = ({ children }) => {
 
     gameStartCountRef.current += 1;
     const currentStartCount = gameStartCountRef.current;
-    const startFrequency = AD_CONFIG.INTERSTITIAL_START_FREQUENCY || 3;
+    const startFrequency = AD_CONFIG.INTERSTITIAL_START_FREQUENCY || 2;
     
     console.log(`[AdsManager] Game start count: ${currentStartCount}, frequency: ${startFrequency}`);
 
     // Show interstitial every N game starts (but not the first game)
-    // Trigger on 3rd, 6th, 9th start etc.
     if (currentStartCount > 1 && currentStartCount % startFrequency === 0) {
       console.log(`[AdsManager] Triggering interstitial on game start #${currentStartCount}`);
       // Show immediately before game starts
       if (isInterstitialLoaded && interstitialRef.current) {
         console.log('[AdsManager] Showing interstitial on game start...');
-        interstitialRef.current.show();
+        try {
+          interstitialRef.current.show();
+        } catch (e) {
+          console.log('[AdsManager] Error showing interstitial:', e);
+          interstitialRef.current.load();
+        }
       } else {
-        console.log('[AdsManager] Interstitial not ready for game start');
+        console.log('[AdsManager] Interstitial not ready for game start, loading...');
+        if (interstitialRef.current) {
+          interstitialRef.current.load();
+        }
       }
     }
   }, [adsRemoved, isInterstitialLoaded]);
