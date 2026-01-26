@@ -1,4 +1,8 @@
-# How to Host Privacy Policy on GitHub Pages (Free)
+# How to Host Privacy Policy & Ads.txt on GitHub Pages (Free)
+
+## Files to Upload
+1. **index.html** - Privacy Policy page
+2. **ads.txt** - Google AdMob verification
 
 ## Step-by-Step Guide (5 minutes)
 
