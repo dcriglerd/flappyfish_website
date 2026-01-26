@@ -157,7 +157,7 @@ export const AdsProvider = ({ children }) => {
         console.log('[AdsManager] Periodic rewarded ad preload check');
         rewardedRef.current.load();
       }
-    }, 30000); // Check every 30 seconds
+    }, 15000); // Check every 15 seconds
 
     return () => {
       unsubscribeLoaded();
