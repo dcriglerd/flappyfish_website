@@ -13,9 +13,10 @@ import { AD_CONFIG } from '../constants/config';
 
 const AdsContext = createContext();
 
-// Get Ad Unit IDs - Use test IDs in development, production IDs when ready
+// Get Ad Unit IDs - Use test IDs only when explicitly enabled
 const getAdUnitId = (type) => {
-  if (__DEV__ || AD_CONFIG.USE_TEST_IDS) {
+  // Only use test IDs if explicitly set in config (for testing purposes)
+  if (AD_CONFIG.USE_TEST_IDS) {
     // Use Google's official test ad unit IDs
     switch (type) {
       case 'BANNER':
@@ -31,9 +32,10 @@ const getAdUnitId = (type) => {
     }
   }
   
-  // Production IDs
+  // Production IDs - always use these unless USE_TEST_IDS is true
   const ids = AD_CONFIG.PRODUCTION_IDS;
   const platformIds = Platform.OS === 'ios' ? ids[type].IOS : ids[type].ANDROID;
+  console.log(`[AdsManager] Using ${type} ad unit:`, platformIds);
   return platformIds;
 };
 
