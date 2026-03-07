@@ -5,7 +5,7 @@ import { useAuth } from './AuthContext';
 const CloudSyncContext = createContext();
 
 // API Base URL - Your backend URL
-const API_BASE_URL = 'https://game-staging-fish.preview.emergentagent.com/api';
+const API_BASE_URL = 'https://fish-arcade-beta.preview.emergentagent.com/api';
 
 // Storage keys
 const STORAGE_KEYS = {

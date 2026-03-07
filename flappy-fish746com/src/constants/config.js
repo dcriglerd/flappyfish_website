@@ -36,16 +36,19 @@ export const AD_CONFIG = {
     },
   },
 
-  // Interstitial frequency - show every N game overs (lower = more frequent)
-  INTERSTITIAL_FREQUENCY: 2,
+  // Interstitial frequency - show every N game overs (higher = less frequent, better UX)
+  // Google Play policy compliant: only show at natural pauses (game over)
+  INTERSTITIAL_FREQUENCY: 3,
   
-  // Interstitial on game START frequency - show every N game starts
-  INTERSTITIAL_START_FREQUENCY: 2,
+  // DISABLED: Interstitial on game START frequency
+  // Google Play policy: Do NOT show interstitials before gameplay begins
+  INTERSTITIAL_START_FREQUENCY: 0, // 0 = disabled
   
-  // App Open ad cooldown in milliseconds (1 minute)
-  APP_OPEN_COOLDOWN: 60000,
+  // App Open ad cooldown in milliseconds (2 minutes - more user friendly)
+  APP_OPEN_COOLDOWN: 120000,
   
-  // Enable App Open ads on app foreground
+  // Disable App Open ads on initial app launch (policy compliant)
+  // They will only show when returning from background after cooldown
   DISABLE_APP_OPEN_ADS: false,
 };
 

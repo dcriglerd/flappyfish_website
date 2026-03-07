@@ -276,24 +276,14 @@ export const AdsProvider = ({ children }) => {
     };
   }, [adsRemoved, isGamePlaying]);
 
-  // Show App Open ad on initial launch
+  // DISABLED: App Open ad on initial launch
+  // Per Google Play policy: Ads should not appear immediately on app launch
+  // App Open ads will only show when returning from background (handled in AppState listener)
   useEffect(() => {
-    // Show app open ad on first launch after a short delay
-    if (isAppOpenLoaded && !adsRemoved && !AD_CONFIG.DISABLE_APP_OPEN_ADS) {
-      const timer = setTimeout(() => {
-        if (appOpenRef.current && !isGamePlaying) {
-          console.log('[AdsManager] Showing App Open ad on launch...');
-          lastAppOpenShowTime.current = Date.now();
-          try {
-            appOpenRef.current.show();
-          } catch (e) {
-            console.log('[AdsManager] Error showing app open ad:', e);
-          }
-        }
-      }, 1500);
-      return () => clearTimeout(timer);
-    }
-  }, [isAppOpenLoaded, adsRemoved, isGamePlaying]);
+    // NOTE: Removed app open ad on initial launch to comply with Google Play policy
+    // App open ads are only shown when user returns from background after cooldown period
+    console.log('[AdsManager] App Open ad on launch DISABLED for policy compliance');
+  }, [isAppOpenLoaded, adsRemoved]);
 
   // Show App Open Ad
   const showAppOpenAd = useCallback(() => {
@@ -329,6 +319,7 @@ export const AdsProvider = ({ children }) => {
   }, [adsRemoved, isInterstitialLoaded]);
 
   // Called on game over - tracks deaths for interstitial frequency
+  // Per Google Play policy: Show ads only at natural breaks (game over is appropriate)
   const onGameOver = useCallback(() => {
     if (adsRemoved) return;
 
@@ -339,10 +330,11 @@ export const AdsProvider = ({ children }) => {
     // Show interstitial every N deaths (starting from the Nth death)
     if (currentDeathCount % AD_CONFIG.INTERSTITIAL_FREQUENCY === 0) {
       console.log(`[AdsManager] Triggering interstitial on death #${currentDeathCount}`);
-      // Small delay to let game over screen appear first
+      // Wait 1.5 seconds to let user see game over screen and score first
+      // This provides a natural break and is policy compliant
       setTimeout(() => {
         if (isInterstitialLoaded && interstitialRef.current) {
-          console.log('[AdsManager] Showing interstitial on game over...');
+          console.log('[AdsManager] Showing interstitial on game over (policy compliant - natural break)...');
           try {
             interstitialRef.current.show();
           } catch (e) {
@@ -355,40 +347,22 @@ export const AdsProvider = ({ children }) => {
             interstitialRef.current.load();
           }
         }
-      }, 300);
+      }, 1500); // 1.5 second delay - lets user see their score first
     }
   }, [adsRemoved, isInterstitialLoaded]);
 
-  // Called on game start - tracks starts for interstitial frequency
+  // Called on game start - only tracks count, NO ADS on game start
+  // Per Google Play policy: Interstitial ads should NOT appear before gameplay
   const onGameStart = useCallback(() => {
     if (adsRemoved) return;
 
     gameStartCountRef.current += 1;
     const currentStartCount = gameStartCountRef.current;
-    const startFrequency = AD_CONFIG.INTERSTITIAL_START_FREQUENCY || 2;
     
-    console.log(`[AdsManager] Game start count: ${currentStartCount}, frequency: ${startFrequency}`);
-
-    // Show interstitial every N game starts (but not the first game)
-    if (currentStartCount > 1 && currentStartCount % startFrequency === 0) {
-      console.log(`[AdsManager] Triggering interstitial on game start #${currentStartCount}`);
-      // Show immediately before game starts
-      if (isInterstitialLoaded && interstitialRef.current) {
-        console.log('[AdsManager] Showing interstitial on game start...');
-        try {
-          interstitialRef.current.show();
-        } catch (e) {
-          console.log('[AdsManager] Error showing interstitial:', e);
-          interstitialRef.current.load();
-        }
-      } else {
-        console.log('[AdsManager] Interstitial not ready for game start, loading...');
-        if (interstitialRef.current) {
-          interstitialRef.current.load();
-        }
-      }
-    }
-  }, [adsRemoved, isInterstitialLoaded]);
+    console.log(`[AdsManager] Game start count: ${currentStartCount} (no interstitial on start - policy compliant)`);
+    // NOTE: Interstitials are ONLY shown on game over, never on game start
+    // This complies with Google Play's "Interruptive Ads" policy
+  }, [adsRemoved]);
 
   // Show rewarded ad (for revive) - with better reliability
   const showRewardedAd = useCallback((onReward) => {

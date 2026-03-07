@@ -17,7 +17,7 @@ const { width: SCREEN_WIDTH } = Dimensions.get('window');
 const LEGAL_URLS = {
   PRIVACY_POLICY: 'https://flappyfish746.com/privacy-policy.html',
   TERMS_OF_SERVICE: 'https://flappyfish746.com/terms-of-service.html',
-  DATA_DELETION: 'https://game-staging-fish.preview.emergentagent.com/api/user/delete-request',
+  DATA_DELETION: 'https://fish-arcade-beta.preview.emergentagent.com/api/user/delete-request',
 };
 
 const LegalModal = ({ visible, onClose }) => {
