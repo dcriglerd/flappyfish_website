@@ -12,6 +12,7 @@ import { CloudSyncProvider } from './src/context/CloudSyncContext';
 import { AchievementsProvider } from './src/context/AchievementsContext';
 import { DailyRewardsProvider } from './src/context/DailyRewardsContext';
 import { NotificationsProvider } from './src/context/NotificationsContext';
+import { PlayGamesProvider } from './src/context/PlayGamesContext';
 
 export default function App() {
   const [isReady, setIsReady] = useState(false);
@@ -59,21 +60,23 @@ export default function App() {
     <SafeAreaView style={styles.container}>
       <StatusBar style="light" />
       <AuthProvider>
-        <NotificationsProvider>
-          <CloudSyncProvider>
-            <AchievementsProvider>
-              <DailyRewardsProvider>
-                <AudioProvider>
-                  <AdsProvider>
-                    <GameProvider>
-                      <FlappyFishGame />
-                    </GameProvider>
-                  </AdsProvider>
-                </AudioProvider>
-              </DailyRewardsProvider>
-            </AchievementsProvider>
-          </CloudSyncProvider>
-        </NotificationsProvider>
+        <PlayGamesProvider>
+          <NotificationsProvider>
+            <CloudSyncProvider>
+              <AchievementsProvider>
+                <DailyRewardsProvider>
+                  <AudioProvider>
+                    <AdsProvider>
+                      <GameProvider>
+                        <FlappyFishGame />
+                      </GameProvider>
+                    </AdsProvider>
+                  </AudioProvider>
+                </DailyRewardsProvider>
+              </AchievementsProvider>
+            </CloudSyncProvider>
+          </NotificationsProvider>
+        </PlayGamesProvider>
       </AuthProvider>
     </SafeAreaView>
   );
