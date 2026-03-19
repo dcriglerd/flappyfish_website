@@ -4,7 +4,7 @@
 export const PLAY_GAMES_CONFIG = {
   // Leaderboard IDs - Create these in Play Console > Play Games Services > Leaderboards
   LEADERBOARDS: {
-    HIGH_SCORE: 'CgkI_YOUR_LEADERBOARD_ID', // Replace with your leaderboard ID
+    HIGH_SCORE: 'CgkIzIvd3O8KEAIQAQ', // Flappy Fish High Score Leaderboard
   },
 
   // Achievement IDs - Create these in Play Console > Play Games Services > Achievements

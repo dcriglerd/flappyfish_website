@@ -13,7 +13,9 @@ import { useAchievements } from '../context/AchievementsContext';
 import { useDailyRewards } from '../context/DailyRewardsContext';
 import { useNotifications } from '../context/NotificationsContext';
 import { useAuth } from '../context/AuthContext';
+import { usePlayGames } from '../context/PlayGamesContext';
 import { COLORS } from '../constants/config';
+import { PLAY_GAMES_CONFIG } from '../constants/playGamesConfig';
 
 import StartScreen from '../components/StartScreen';
 import GameOverScreen from '../components/GameOverScreen';
@@ -133,6 +135,8 @@ const FlappyFishGame = () => {
   } = useNotifications();
 
   const { getDisplayName, username } = useAuth();
+
+  const { submitScore, showLeaderboard: showPlayGamesLeaderboard, isSignedIn: isPlayGamesSignedIn } = usePlayGames();
 
   // Trigger onAppOpen for notifications when app loads
   useEffect(() => {
@@ -281,7 +285,12 @@ const FlappyFishGame = () => {
     playGameOverSound();
     gameOver();
     onAdsGameOver();
-  }, [gameOver, onAdsGameOver, playGameOverSound]);
+    
+    // Submit score to Google Play Games leaderboard
+    if (isPlayGamesSignedIn && score > 0) {
+      submitScore(PLAY_GAMES_CONFIG.LEADERBOARDS.HIGH_SCORE, score);
+    }
+  }, [gameOver, onAdsGameOver, playGameOverSound, isPlayGamesSignedIn, score, submitScore]);
 
   // Handle retry
   const handleRetry = useCallback(() => {

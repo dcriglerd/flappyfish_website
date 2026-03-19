@@ -43,7 +43,6 @@
       "permissions": [
         "com.google.android.gms.permission.AD_ID"
       ],
-      "googleServicesFile": "./google-services.json",
       "intentFilters": [
         {
           "action": "VIEW",
