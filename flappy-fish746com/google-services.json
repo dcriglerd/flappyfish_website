@@ -1,0 +1,30 @@
+{
+  "project_info": {
+    "project_number": "373588182476",
+    "project_id": "flappy-fish746",
+    "storage_bucket": "flappy-fish746.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:373588182476:android:b8571b183fffcb24efc969",
+        "android_client_info": {
+          "package_name": "com.flappyfish.game"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB94lSKiblPvksQCVb8XUsfsJP7qzNpK18"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      },
+      "admob_app_id": "ca-app-pub-9210526164379066~4938293330"
+    }
+  ],
+  "configuration_version": "1"
+}
